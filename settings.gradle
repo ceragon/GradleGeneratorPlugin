@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'GradlePlugin'
-include('plugin')
+include('proto-plugin')
