@@ -9,3 +9,5 @@
 
 rootProject.name = 'GradlePlugin'
 include('proto-plugin')
+include 'common'
+
