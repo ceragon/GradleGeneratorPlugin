@@ -15,3 +15,6 @@ gradle-app.setting
 /.idea/
 
 /.gradle/
+/common/build/
+/proto-plugin/build/
+/proto-example/build/

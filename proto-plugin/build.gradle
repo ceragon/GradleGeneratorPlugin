@@ -6,10 +6,6 @@
  * User Manual available at https://docs.gradle.org/7.2/userguide/custom_plugins.html
  */
 
-plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
-    id 'java-gradle-plugin'
-}
 
 dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.17.3'
@@ -22,6 +18,8 @@ gradlePlugin {
     plugins {
         greeting {
             id = 'com.ceragon.greeting'
+            displayName = 'greeting'
+            description = 'hello world'
             implementationClass = 'com.ceragon.GradlePluginPlugin'
         }
     }
