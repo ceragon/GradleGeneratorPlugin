@@ -17,10 +17,10 @@ gradlePlugin {
     // Define the plugin
     plugins {
         greeting {
-            id = 'com.ceragon.greeting'
-            displayName = 'greeting'
-            description = 'hello world'
-            implementationClass = 'com.ceragon.GradlePluginPlugin'
+            id = 'com.ceragon.generator'
+            displayName = 'generator'
+            description = 'generate [protobuf,table,rpc]'
+            implementationClass = 'com.ceragon.GradleGeneratorPlugin'
         }
     }
 }

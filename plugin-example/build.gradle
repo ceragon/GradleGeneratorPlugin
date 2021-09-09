@@ -1,0 +1,15 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.ceragon:plugin:1.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'com.ceragon.generator'
+
+proto {
+
+}

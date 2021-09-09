@@ -3,6 +3,7 @@
  */
 package com.ceragon;
 
+import com.ceragon.extension.ProtoExtension;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.provider.Property;
@@ -10,7 +11,7 @@ import org.gradle.api.provider.Property;
 /**
  * A simple 'hello world' plugin.
  */
-public class GradlePluginPlugin implements Plugin<Project> {
+public class GradleGeneratorPlugin implements Plugin<Project> {
     public static abstract class GreetingPluginExtension {
         public abstract Property<String> getMessage();
 
@@ -20,13 +21,19 @@ public class GradlePluginPlugin implements Plugin<Project> {
     }
 
     public void apply(Project project) {
-        // Register a task
-//        project.getTasks().register("greeting", task -> {
-//            task.doLast(s -> System.out.println("Hello from plugin 'com.ceragon.greeting'!!"));
-//        });
+        ProtoExtension protoExtension = project.getExtensions().create("proto", ProtoExtension.class);
+        project.getTasks().register("proto", task -> {
+            task.doLast(s -> System.out.println("version:" + protoExtension.getProtocVersion().get()));
+        });
+
         GreetingPluginExtension extension = project.getExtensions().create("test", GreetingPluginExtension.class);
-        project.getTasks().register("greeting", task -> {
+        project.getTasks().register("build", task -> {
             task.doLast(s -> System.out.println("say:" + extension.getMessage().get()));
+        });
+
+        GreetingPluginExtension extension1 = project.getExtensions().create("test1", GreetingPluginExtension.class);
+        project.getTasks().register("buildTable", task -> {
+            task.doLast(s -> System.out.println("table say:" + extension1.getMessage().get()));
         });
     }
 }
