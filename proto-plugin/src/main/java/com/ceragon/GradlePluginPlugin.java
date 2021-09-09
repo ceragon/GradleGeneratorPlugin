@@ -5,15 +5,28 @@ package com.ceragon;
 
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.provider.Property;
 
 /**
  * A simple 'hello world' plugin.
  */
 public class GradlePluginPlugin implements Plugin<Project> {
+    public static abstract class GreetingPluginExtension {
+        public abstract Property<String> getMessage();
+
+        public GreetingPluginExtension() {
+            getMessage().convention("default text");
+        }
+    }
+
     public void apply(Project project) {
         // Register a task
+//        project.getTasks().register("greeting", task -> {
+//            task.doLast(s -> System.out.println("Hello from plugin 'com.ceragon.greeting'!!"));
+//        });
+        GreetingPluginExtension extension = project.getExtensions().create("test", GreetingPluginExtension.class);
         project.getTasks().register("greeting", task -> {
-            task.doLast(s -> System.out.println("Hello from plugin 'com.ceragon.greeting'!!"));
+            task.doLast(s -> System.out.println("say:" + extension.getMessage().get()));
         });
     }
 }

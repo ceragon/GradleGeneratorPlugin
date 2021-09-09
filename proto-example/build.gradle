@@ -1,21 +1,15 @@
-plugins {
-    id 'java'
-    id 'com.ceragon.greeting' version '1.0-SNAPSHOT'
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.ceragon:proto-plugin:1.0-SNAPSHOT'
+    }
 }
 
-group 'com.ceragon'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-}
+apply plugin: 'com.ceragon.greeting'
 
 test {
-    useJUnitPlatform()
+    message = 'hit'
 }
