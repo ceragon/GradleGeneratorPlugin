@@ -1,32 +1,52 @@
 package com.ceragon.extension;
 
 import com.github.os72.protocjar.ProtocVersion;
+import groovy.lang.Closure;
+import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.file.Directory;
-import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.FileTree;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.provider.Property;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.provider.ProviderFactory;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.tasks.Internal;
+import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 abstract public class ProtoExtension {
     @Internal("protoc 的版本号")
-    abstract public Property<String> getProtocVersion();
+    public String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
 
     @Internal("proto 文件的目录")
-    abstract public RegularFileProperty getInputDirectory();
+    abstract public ListProperty<RegularFile> getInputDirectory();
+
+    @Internal("输出配置")
+    public List<OutputTarget> outputTargets = new ArrayList<>();
 
     @Inject
-    public ProtoExtension(ObjectFactory objects, ProviderFactory providers) {
-        getProtocVersion().convention(ProtocVersion.PROTOC_VERSION.mVersion);
+    public ProtoExtension(ObjectFactory factory) {
+
+        getInputDirectory().convention();
     }
+
+    public String getProtocVersion() {
+        return protocVersion;
+    }
+
+    public List<OutputTarget> getOutputTargets() {
+        return outputTargets;
+    }
+
+    public OutputTarget outputTarget(Action<OutputTarget> action) {
+        OutputTarget outputTarget = new OutputTarget();
+        action.execute(outputTarget);
+        return outputTarget;
+    }
+
+    public OutputTarget outputTarget(Closure closure) {
+        return ConfigureUtil.configure(closure, new OutputTarget());
+    }
+
 }

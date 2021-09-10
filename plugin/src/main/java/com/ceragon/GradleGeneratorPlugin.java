@@ -3,7 +3,9 @@
  */
 package com.ceragon;
 
+import com.ceragon.extension.OutputTarget;
 import com.ceragon.extension.ProtoExtension;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.provider.Property;
@@ -23,7 +25,11 @@ public class GradleGeneratorPlugin implements Plugin<Project> {
     public void apply(Project project) {
         ProtoExtension protoExtension = project.getExtensions().create("proto", ProtoExtension.class);
         project.getTasks().register("proto", task -> {
-            task.doLast(s -> System.out.println("version:" + protoExtension.getProtocVersion().get()));
+            task.doLast(s -> {
+                System.out.println("version:" + protoExtension.getProtocVersion());
+                System.out.println("file:" + protoExtension.getInputDirectory());
+                System.out.println("output:" + protoExtension.getOutputTargets());
+            });
         });
 
         GreetingPluginExtension extension = project.getExtensions().create("test", GreetingPluginExtension.class);
