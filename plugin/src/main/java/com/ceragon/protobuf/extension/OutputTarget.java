@@ -1,8 +1,9 @@
-package com.ceragon.extension;
+package com.ceragon.protobuf.extension;
 
 import lombok.Data;
 import lombok.ToString;
-import org.gradle.api.file.Directory;
+
+import java.io.File;
 
 @Data
 @ToString
@@ -10,7 +11,7 @@ public class OutputTarget {
     String type = "java";
     String addSources = "main";
     boolean cleanOutputFolder = true;
-    Directory outputDirectory;
+    File outputDirectory;
     String outputDirectorySuffix;
     String outputOptions;
 }

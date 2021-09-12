@@ -12,6 +12,9 @@ apply plugin: 'com.ceragon.generator'
 
 
 proto {
+    protoFilePaths = [
+            layout.projectDirectory.file("protofiles")
+    ]
     inputDirectory = [
             layout.projectDirectory.file("protofiles")
     ]

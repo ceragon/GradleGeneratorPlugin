@@ -3,16 +3,24 @@ package com.ceragon.util;
 
 import org.gradle.api.Project;
 
+import java.io.File;
 import java.util.Map;
 
 public class PathFormat {
+    public final static String PROJECT_BUILD_DIR = "project.build.dir";
+    public final static String PROJECT_BASE_DIR = "project.base.dir";
+    public final static String SEPARATOR = "s";
     private final Map<String, Object> basicVar;
 
     public PathFormat(Project project) {
 
-        String projectSrcDir = project.getProjectDir().getPath();
+        String projectSrcDir = project.getBuildDir().getPath();
         String projectBaseDir = project.getProjectDir().getPath();
-        this.basicVar = Map.of("project.src.dir", projectSrcDir, "project.base.dir", projectBaseDir);
+        this.basicVar = Map.of(
+                PROJECT_BUILD_DIR, projectSrcDir,
+                PROJECT_BASE_DIR, projectBaseDir,
+                SEPARATOR, File.separator
+        );
     }
 
 

@@ -18,3 +18,4 @@ gradle-app.setting
 /common/build/
 /proto-plugin/build/
 /proto-example/build/
+/plugin/build/

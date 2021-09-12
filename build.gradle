@@ -28,6 +28,7 @@ subprojects {
         implementation 'commons-io:commons-io:2.11.0'
 
         compileOnly 'org.projectlombok:lombok:1.18.20'
+        annotationProcessor 'org.projectlombok:lombok:1.18.20'
     }
     test {
         useJUnitPlatform()

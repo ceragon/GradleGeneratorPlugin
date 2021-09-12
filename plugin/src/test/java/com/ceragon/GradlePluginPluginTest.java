@@ -15,7 +15,7 @@ class GradlePluginPluginTest {
     @Test void pluginRegistersATask() {
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
-        project.getPlugins().apply("com.ceragon.greeting");
+        project.getPlugins().apply("com.ceragon.generator");
 
         // Verify the result
         assertNotNull(project.getTasks().findByName("greeting"));

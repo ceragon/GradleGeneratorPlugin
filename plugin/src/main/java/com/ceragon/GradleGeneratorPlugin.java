@@ -3,43 +3,25 @@
  */
 package com.ceragon;
 
-import com.ceragon.extension.OutputTarget;
-import com.ceragon.extension.ProtoExtension;
-import org.gradle.api.NamedDomainObjectContainer;
-import org.gradle.api.Project;
+import com.ceragon.protobuf.ProtoGeneratorTask;
+import com.ceragon.protobuf.extension.ProtoExtension;
 import org.gradle.api.Plugin;
-import org.gradle.api.provider.Property;
+import org.gradle.api.Project;
 
 /**
  * A simple 'hello world' plugin.
  */
 public class GradleGeneratorPlugin implements Plugin<Project> {
-    public static abstract class GreetingPluginExtension {
-        public abstract Property<String> getMessage();
 
-        public GreetingPluginExtension() {
-            getMessage().convention("default text");
-        }
-    }
 
+    @Override
     public void apply(Project project) {
+        PluginContext.init(project);
         ProtoExtension protoExtension = project.getExtensions().create("proto", ProtoExtension.class);
-        project.getTasks().register("proto", task -> {
-            task.doLast(s -> {
-                System.out.println("version:" + protoExtension.getProtocVersion());
-                System.out.println("file:" + protoExtension.getInputDirectory());
-                System.out.println("output:" + protoExtension.getOutputTargets());
-            });
-        });
+        ProtoGeneratorTask protoGeneratorTask = new ProtoGeneratorTask(protoExtension);
+        project.getTasks().register("proto", task -> task.doLast(protoGeneratorTask::execute));
+        PluginContext.buildContext().clear();
 
-        GreetingPluginExtension extension = project.getExtensions().create("test", GreetingPluginExtension.class);
-        project.getTasks().register("build", task -> {
-            task.doLast(s -> System.out.println("say:" + extension.getMessage().get()));
-        });
 
-        GreetingPluginExtension extension1 = project.getExtensions().create("test1", GreetingPluginExtension.class);
-        project.getTasks().register("buildTable", task -> {
-            task.doLast(s -> System.out.println("table say:" + extension1.getMessage().get()));
-        });
     }
 }

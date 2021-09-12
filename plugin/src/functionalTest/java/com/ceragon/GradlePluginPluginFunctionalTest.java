@@ -3,11 +3,18 @@
  */
 package com.ceragon;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.io.FileWriter;
 import java.nio.file.Files;
+
+import org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.BuildResult;
 import org.junit.jupiter.api.Test;
@@ -22,16 +29,19 @@ class GradlePluginPluginFunctionalTest {
         File projectDir = new File("build/functionalTest");
         Files.createDirectories(projectDir.toPath());
         writeString(new File(projectDir, "settings.gradle"), "");
-        writeString(new File(projectDir, "build.gradle"),
-            "plugins {" +
-            "  id('com.ceragon.greeting')" +
-            "}");
+        InputStream inputStream = GradlePluginPluginFunctionalTest.class.getResourceAsStream("/build.gradle");
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+             ){
+            String str = new String(bufferedInputStream.readAllBytes());
+            writeString(new File(projectDir, "build.gradle"), str);
+        }
+
 
         // Run the build
         GradleRunner runner = GradleRunner.create();
         runner.forwardOutput();
         runner.withPluginClasspath();
-        runner.withArguments("greeting");
+        runner.withArguments("proto");
         runner.withProjectDir(projectDir);
         BuildResult result = runner.build();
 
