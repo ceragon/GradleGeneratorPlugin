@@ -1,0 +1,20 @@
+syntax = "proto3";
+option java_package = "com.ceragon.monkeygame.proto.common";
+option java_outer_classname = "ProtoCommon";
+option java_multiple_files = true;
+import "ProtoBase.proto";
+
+message NoticeParam{
+  Type type = 1; // 参数类型
+  int32 code = 2;
+  string str = 3;
+  enum Type {
+    STRING = 0; // 字符串类型
+    LANG_ID = 1; // language表的Id
+  }
+}
+message PushTopNotice{
+  option (msgId) = 101;
+  int32 code = 1; // 消息Id
+  repeated NoticeParam params = 2; // 参数列表
+}

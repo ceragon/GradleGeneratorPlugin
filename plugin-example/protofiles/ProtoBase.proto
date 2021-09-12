@@ -1,0 +1,6 @@
+syntax = "proto3";
+option java_package = "com.ceragon.monkeygame.proto";
+import "google/protobuf/descriptor.proto";
+extend google.protobuf.MessageOptions {
+  int32 msgId = 5000;
+}

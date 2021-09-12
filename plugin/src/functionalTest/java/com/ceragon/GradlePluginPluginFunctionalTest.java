@@ -46,7 +46,7 @@ class GradlePluginPluginFunctionalTest {
         BuildResult result = runner.build();
 
         // Verify the result
-        assertTrue(result.getOutput().contains("Hello from plugin 'com.ceragon.greeting'"));
+        assertTrue(result.getOutput().contains("BUILD SUCCESSFUL "));
     }
 
     private void writeString(File file, String string) throws IOException {

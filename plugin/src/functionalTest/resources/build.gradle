@@ -1,7 +1,11 @@
 plugins {
-    id "java"
     id('com.ceragon.generator')
 }
-dependencies {
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
+
+proto {
+    outputTargets = [
+            outputTarget {
+                type = "java"
+            }
+    ]
 }

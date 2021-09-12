@@ -27,7 +27,7 @@ public class ProtoExtension {
 
     public ProtoExtension() {
         protoFilePaths = List.of(
-                new File(PluginContext.pathFormat().format("${project.base.dir}${s}proto"))
+                new File(PluginContext.pathFormat().format("${project.base.dir}${s}protofiles"))
         );
     }
 
@@ -47,6 +47,11 @@ public class ProtoExtension {
         OutputTarget outputTarget = new OutputTarget();
         action.execute(outputTarget);
         return outputTarget;
+    }
+
+    //region 闭包方法区
+    public File baseDir(String path) {
+        return new File(PluginContext.pathFormat().format("${project.base.dir}${s}" + path));
     }
 
     public OutputTarget outputTarget(Closure closure) {
@@ -82,4 +87,5 @@ public class ProtoExtension {
     public void everyProtoBuild(Closure closure) {
         everyProtoBuild.add(ConfigureUtil.configure(closure, new EveryProtoBuildConfig()));
     }
+    //endregion
 }
