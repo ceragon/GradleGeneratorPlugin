@@ -2,6 +2,7 @@ package com.ceragon.protobuf.extension;
 
 import lombok.Data;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -40,20 +40,19 @@ public class ProtoGeneratorTask {
 
             MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescPojoList);
 
+            String resourceRoot = extension.templatePath;
 
-            String resourceRoot = task.getProject().getProjectDir().getPath();
-
-            if (!msgCodeBuild.buildTotalMsgCode(resourceRoot, extension.totalMsgBuild)) {
+            if (!msgCodeBuild.buildTotalMsgCode(resourceRoot, extension.totalMsgBuilds)) {
                 throw new PluginTaskException("build totalMsg code error");
             }
-            if (!msgCodeBuild.buildEveryMsgCode(resourceRoot, extension.everyMsgBuild)) {
+            if (!msgCodeBuild.buildEveryMsgCode(resourceRoot, extension.everyMsgBuilds)) {
                 throw new PluginTaskException("build everyMsg code error");
             }
-            if (!msgCodeBuild.buildEveryProtoCode(resourceRoot, extension.everyProtoBuild)) {
+            if (!msgCodeBuild.buildEveryProtoCode(resourceRoot, extension.everyProtoBuilds)) {
                 throw new PluginTaskException("build everyProto code error");
             }
         } catch (Throwable e) {
-
+            task.getLogger().error(e.getMessage(), e);
         }
     }
 

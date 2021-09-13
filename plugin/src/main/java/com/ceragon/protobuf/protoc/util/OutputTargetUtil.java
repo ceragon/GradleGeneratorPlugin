@@ -29,17 +29,18 @@ public class OutputTargetUtil {
         if (target.getOutputDirectory() == null) {
             String subdir = "generated-" + ("test".equals(target.getAddSources()) ? "test-" : "") + "sources";
             target.setOutputDirectory(
-                    new File(PluginContext.project().getBuildDir().getPath() + File.separator + subdir + File.separator)
+                    PluginContext.project().getBuildDir().getPath() + File.separator + subdir + File.separator
             );
         }
 
         if (target.getOutputDirectorySuffix() != null) {
-            target.setOutputDirectory(new File(target.getOutputDirectory(), target.getOutputDirectorySuffix()));
+            target.setOutputDirectory(new File(target.getOutputDirectory(),
+                    target.getOutputDirectorySuffix()).getPath());
         }
     }
 
     public static void preprocessTarget(OutputTarget target) throws PluginTaskException {
-        File f = target.getOutputDirectory();
+        File f = new File(target.getOutputDirectory());
         if (!f.exists()) {
             PluginContext.log().info(f + " does not exist. Creating...");
             f.mkdirs();
@@ -55,7 +56,7 @@ public class OutputTargetUtil {
         }
     }
 
-    public static void processTarget(String protocCommand, final List<File> inputDirectoryList,
+    public static void processTarget(String protocCommand, final List<String> inputDirectoryList,
                                      final List<File> includeDirectoryList, final OutputTarget target) throws PluginTaskException {
         Logger log = PluginContext.log();
         BuildContext context = PluginContext.buildContext();
@@ -69,20 +70,21 @@ public class OutputTargetUtil {
         }
 
         FileFilter fileFilter = new FileFilter(extension);
-        for (File input : inputDirectoryList) {
+        for (String input : inputDirectoryList) {
             if (input == null) continue;
-
-            if (input.exists() && input.isDirectory()) {
-                Collection<File> protoFiles = FileUtils.listFiles(input, fileFilter, TrueFileFilter.INSTANCE);
+            File inputFile = new File(input);
+            if (inputFile.exists() && inputFile.isDirectory()) {
+                Collection<File> protoFiles = FileUtils.listFiles(inputFile, fileFilter, TrueFileFilter.INSTANCE);
                 for (File protoFile : protoFiles) {
                     if (target.isCleanOutputFolder()) {
-                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, null, target.getOutputDirectory(), target.getOutputOptions());
+                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, null,
+                                target.getOutputDirectory(), target.getOutputOptions());
                     } else {
                         log.info("Not changed " + protoFile);
                     }
                 }
             } else {
-                if (input.exists()) log.warn(input + " is not a directory");
+                if (inputFile.exists()) log.warn(input + " is not a directory");
                 else log.warn(input + " does not exist");
             }
         }
@@ -90,7 +92,7 @@ public class OutputTargetUtil {
         if (shaded) {
             try {
                 log.info("    Shading (version " + protocVersion + "): " + target.getOutputDirectory());
-                Protoc.doShading(target.getOutputDirectory(), protocVersion);
+                Protoc.doShading(new File(target.getOutputDirectory()), protocVersion);
             } catch (IOException e) {
                 throw new PluginTaskException("Error occurred during shading", e);
             }
@@ -98,7 +100,7 @@ public class OutputTargetUtil {
     }
 
     private static void processFile(final List<File> includeDirectories, final String protocCommand, final File file,
-                                    final String type, final String pluginPath, final File outputDir,
+                                    final String type, final String pluginPath, final String outputDir,
                                     final String outputOptions) throws PluginTaskException {
         Logger log = PluginContext.log();
         log.info("    Processing (" + type + "): " + file.getName());
@@ -147,7 +149,8 @@ public class OutputTargetUtil {
         }
     }
 
-    private static Collection<String> buildCommand(List<File> includeDirectories, File file, String type, String pluginPath, File outputDir, String outputOptions) throws PluginTaskException{
+    private static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
+                                                   String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
         Logger log = PluginContext.log();
         BuildContext context = PluginContext.buildContext();
         final String version = context.getValue(ContextKey.PROTOC_VERSION);

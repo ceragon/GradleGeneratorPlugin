@@ -21,7 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class DescriptorLoader {
-    public static List<ProtoFileDescPojo> loadDesc(File descPath) {
+    public static List<ProtoFileDescPojo> loadDesc(String descPathStr) {
+        File descPath = new File(descPathStr);
         FileFilter fileFilter = new FileFilter(".desc");
         List<ProtoFileDescPojo> fileDescPojos = new ArrayList<>();
         if (!FileUtils.listFiles(descPath, fileFilter, TrueFileFilter.INSTANCE).stream()

@@ -26,7 +26,7 @@ public class ProtocBuild {
     private static final String DEFAULT_INPUT_DIR = "/src/main/resources/".replace('/', File.separatorChar);
 
     String protocVersion;
-    List<File> inputDirectories;
+    List<String> inputDirectories;
     File[] includeDirectories;
     boolean includeStdTypes;
     boolean includeImports;
@@ -43,8 +43,7 @@ public class ProtocBuild {
             inputDirectories = new ArrayList<>();
         }
         if (inputDirectories.isEmpty()) {
-            File inputDir = new File(project.getBuildDir().getAbsolutePath() + DEFAULT_INPUT_DIR);
-            inputDirectories.add(inputDir);
+            inputDirectories.add(project.getBuildDir().getAbsolutePath() + DEFAULT_INPUT_DIR);
         }
 
         context.setValue(ContextKey.PROTOC_VERSION, protocVersion);

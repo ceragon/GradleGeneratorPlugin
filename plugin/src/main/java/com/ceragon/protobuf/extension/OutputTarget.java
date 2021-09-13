@@ -11,7 +11,7 @@ public class OutputTarget {
     String type = "java";
     String addSources = "main";
     boolean cleanOutputFolder = true;
-    File outputDirectory;
+    String outputDirectory;
     String outputDirectorySuffix;
     String outputOptions;
 }

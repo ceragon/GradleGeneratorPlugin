@@ -21,4 +21,10 @@ proto {
                 type = "java"
             }
     ]
+    totalMsgBuilds = [
+            totalMsgBuild {
+                vmFile = "HOpCommand.vm"
+                targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
+            }
+    ]
 }

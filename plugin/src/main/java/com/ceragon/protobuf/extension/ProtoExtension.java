@@ -7,7 +7,6 @@ import org.gradle.api.Action;
 import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,31 +15,21 @@ public class ProtoExtension {
     public String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
 
     @Internal("proto 文件的目录")
-    public List<File> protoFilePaths;
+    public List<String> protoFilePaths;
 
     @Internal("输出配置")
     public List<OutputTarget> outputTargets = new ArrayList<>();
-
-    public List<TotalMsgBuildConfig> totalMsgBuild = new ArrayList<>();
-    public List<EveryMsgBuildConfig> everyMsgBuild = new ArrayList<>();
-    public List<EveryProtoBuildConfig> everyProtoBuild = new ArrayList<>();
+    @Internal("模板文件的目录")
+    public String templatePath;
+    public List<TotalMsgBuildConfig> totalMsgBuilds = new ArrayList<>();
+    public List<EveryMsgBuildConfig> everyMsgBuilds = new ArrayList<>();
+    public List<EveryProtoBuildConfig> everyProtoBuilds = new ArrayList<>();
 
     public ProtoExtension() {
         protoFilePaths = List.of(
-                new File(PluginContext.pathFormat().format("${project.base.dir}${s}protofiles"))
+                PluginContext.pathFormat().format("${project.base.dir}${s}protofiles")
         );
-    }
-
-    public String getProtocVersion() {
-        return protocVersion;
-    }
-
-    public List<File> getProtoFilePaths() {
-        return protoFilePaths;
-    }
-
-    public List<OutputTarget> getOutputTargets() {
-        return outputTargets;
+        templatePath = PluginContext.pathFormat().format("${project.base.dir}${s}template");
     }
 
     public OutputTarget outputTarget(Action<OutputTarget> action) {
@@ -50,42 +39,42 @@ public class ProtoExtension {
     }
 
     //region 闭包方法区
-    public File baseDir(String path) {
-        return new File(PluginContext.pathFormat().format("${project.base.dir}${s}" + path));
+    public String baseDir(String path) {
+        return PluginContext.pathFormat().format("${project.base.dir}${s}" + path);
     }
 
     public OutputTarget outputTarget(Closure closure) {
         return ConfigureUtil.configure(closure, new OutputTarget());
     }
 
-    public void totalMsgBuild(Action<TotalMsgBuildConfig> action) {
+    public TotalMsgBuildConfig totalMsgBuild(Action<TotalMsgBuildConfig> action) {
         TotalMsgBuildConfig config = new TotalMsgBuildConfig();
         action.execute(config);
-        totalMsgBuild.add(config);
+        return config;
     }
 
-    public void totalMsgBuild(Closure closure) {
-        totalMsgBuild.add(ConfigureUtil.configure(closure, new TotalMsgBuildConfig()));
+    public TotalMsgBuildConfig totalMsgBuild(Closure closure) {
+        return ConfigureUtil.configure(closure, new TotalMsgBuildConfig());
     }
 
-    public void everyMsgBuild(Action<EveryMsgBuildConfig> action) {
+    public EveryMsgBuildConfig everyMsgBuild(Action<EveryMsgBuildConfig> action) {
         EveryMsgBuildConfig config = new EveryMsgBuildConfig();
         action.execute(config);
-        everyMsgBuild.add(config);
+        return config;
     }
 
-    public void everyMsgBuild(Closure closure) {
-        everyMsgBuild.add(ConfigureUtil.configure(closure, new EveryMsgBuildConfig()));
+    public EveryMsgBuildConfig everyMsgBuild(Closure closure) {
+        return ConfigureUtil.configure(closure, new EveryMsgBuildConfig());
     }
 
-    public void everyProtoBuild(Action<EveryProtoBuildConfig> action) {
+    public EveryProtoBuildConfig everyProtoBuild(Action<EveryProtoBuildConfig> action) {
         EveryProtoBuildConfig config = new EveryProtoBuildConfig();
         action.execute(config);
-        everyProtoBuild.add(config);
+        return config;
     }
 
-    public void everyProtoBuild(Closure closure) {
-        everyProtoBuild.add(ConfigureUtil.configure(closure, new EveryProtoBuildConfig()));
+    public EveryProtoBuildConfig everyProtoBuild(Closure closure) {
+        return ConfigureUtil.configure(closure, new EveryProtoBuildConfig());
     }
     //endregion
 }
