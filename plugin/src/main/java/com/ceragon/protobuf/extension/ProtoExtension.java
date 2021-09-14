@@ -4,10 +4,12 @@ import com.ceragon.PluginContext;
 import com.github.os72.protocjar.ProtocVersion;
 import groovy.lang.Closure;
 import org.gradle.api.Action;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Nested;
 import org.gradle.util.internal.ConfigureUtil;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,22 +31,23 @@ public class ProtoExtension {
     @Nested
     public List<EveryProtoBuildConfig> everyProtoBuilds = new ArrayList<>();
 
-    public ProtoExtension() {
+    @Inject
+    public ProtoExtension(Project project) {
         protoFilePaths = List.of(
                 PluginContext.pathFormat().format("${project.base.dir}${s}protofiles")
         );
         templatePath = PluginContext.pathFormat().format("${project.base.dir}${s}template");
     }
 
+    //region 闭包方法区
+    public String baseDir(String path) {
+        return PluginContext.pathFormat().format("${project.base.dir}${s}" + path);
+    }
+
     public OutputTarget outputTarget(Action<OutputTarget> action) {
         OutputTarget outputTarget = new OutputTarget();
         action.execute(outputTarget);
         return outputTarget;
-    }
-
-    //region 闭包方法区
-    public String baseDir(String path) {
-        return PluginContext.pathFormat().format("${project.base.dir}${s}" + path);
     }
 
     public OutputTarget outputTarget(Closure closure) {

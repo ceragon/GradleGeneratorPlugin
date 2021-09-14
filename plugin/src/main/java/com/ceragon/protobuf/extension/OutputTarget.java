@@ -1,7 +1,10 @@
 package com.ceragon.protobuf.extension;
 
+import groovy.lang.Closure;
 import lombok.Data;
 import lombok.ToString;
+import org.gradle.api.Action;
+import org.gradle.util.internal.ConfigureUtil;
 
 import java.io.File;
 
@@ -14,4 +17,5 @@ public class OutputTarget {
     String outputDirectory;
     String outputDirectorySuffix;
     String outputOptions;
+
 }

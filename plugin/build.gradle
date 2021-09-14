@@ -21,7 +21,7 @@ gradlePlugin {
     plugins {
         protoPlugin {
             id = 'com.ceragon.proto'
-            implementationClass = 'com.ceragon.GradleGeneratorPlugin'
+            implementationClass = 'com.ceragon.GradleProtoPlugin'
         }
     }
 }

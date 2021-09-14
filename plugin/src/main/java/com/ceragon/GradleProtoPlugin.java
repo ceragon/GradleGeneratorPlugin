@@ -11,7 +11,7 @@ import org.gradle.api.Project;
 /**
  * A simple 'hello world' plugin.
  */
-public class GradleGeneratorPlugin implements Plugin<Project> {
+public class GradleProtoPlugin implements Plugin<Project> {
 
 
     @Override
