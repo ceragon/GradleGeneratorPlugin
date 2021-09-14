@@ -5,23 +5,37 @@
  * For more details take a look at the Writing Custom Plugins chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.2/userguide/custom_plugins.html
  */
-
+plugins {
+    id "com.gradle.plugin-publish" version "0.15.0"
+}
 
 dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.17.3'
     implementation 'com.github.os72:protoc-jar:3.11.4'
     implementation group: 'com.alibaba', name: 'easyexcel', version: '2.2.10'
-    implementation project(':common')
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
 }
 
 gradlePlugin {
     // Define the plugin
     plugins {
-        greeting {
-            id = 'com.ceragon.generator'
-            displayName = 'generator'
-            description = 'generate [protobuf,table,rpc]'
+        protoPlugin {
+            id = 'com.ceragon.proto'
             implementationClass = 'com.ceragon.GradleGeneratorPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/ceragon/GradleGeneratorPlugin'
+    vcsUrl = 'https://github.com/ceragon/GradleGeneratorPlugin'
+
+    plugins {
+        protoPlugin {
+            // id is captured from java-gradle-plugin configuration
+            displayName = 'Gradle proto generate plugin'
+            description = "generate code from protobuf file"
+            tags = ['protobuf']
         }
     }
 }
@@ -51,3 +65,4 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
