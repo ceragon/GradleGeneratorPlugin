@@ -1,16 +1,14 @@
 package com.ceragon.protobuf.extension;
 
-import groovy.lang.Closure;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.gradle.api.Action;
-import org.gradle.util.internal.ConfigureUtil;
-
-import java.io.File;
 
 @Data
 @ToString
+@RequiredArgsConstructor
 public class OutputTarget {
+    final String name;
     String type = "java";
     String addSources = "main";
     boolean cleanOutputFolder = true;

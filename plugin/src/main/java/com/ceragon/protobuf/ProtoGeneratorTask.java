@@ -10,6 +10,7 @@ import com.ceragon.util.PluginTaskException;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskExecutionException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProtoGeneratorTask {
@@ -25,31 +26,31 @@ public class ProtoGeneratorTask {
             prepareExecute();
 
             ProtocBuild protocBuild = ProtocBuild.builder()
-                    .protocVersion(extension.protocVersion)
-                    .inputDirectories(extension.protoFilePaths)
+                    .protocVersion(extension.getProtocVersion())
+                    .inputDirectories(extension.getProtoFilePaths())
                     .includeStdTypes(true)
                     .includeImports(false)
                     .build();
-
-            OutputTarget descriptorTarget = new OutputTarget();
+            List<OutputTarget> outputTargets = new ArrayList<>(extension.getOutputTargets());
+            OutputTarget descriptorTarget = new OutputTarget("");
             descriptorTarget.setType("descriptor");
-            extension.outputTargets.add(descriptorTarget);
+            outputTargets.add(descriptorTarget);
             // 生成目标proto格式，以及描述信息
-            protocBuild.process(extension.outputTargets);
+            protocBuild.process(outputTargets);
             // 加载描述信息
             List<ProtoFileDescPojo> protoFileDescPojoList = DescriptorLoader.loadDesc(descriptorTarget.getOutputDirectory());
 
             MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescPojoList);
 
-            String resourceRoot = extension.templatePath;
+            String resourceRoot = extension.getTemplatePath();
 
-            if (!msgCodeBuild.buildTotalMsgCode(resourceRoot, extension.totalMsgBuilds)) {
+            if (!msgCodeBuild.buildTotalMsgCode(resourceRoot, extension.getTotalMsgBuilds())) {
                 throw new PluginTaskException("build totalMsg code error");
             }
-            if (!msgCodeBuild.buildEveryMsgCode(resourceRoot, extension.everyMsgBuilds)) {
+            if (!msgCodeBuild.buildEveryMsgCode(resourceRoot, extension.getEveryMsgBuilds())) {
                 throw new PluginTaskException("build everyMsg code error");
             }
-            if (!msgCodeBuild.buildEveryProtoCode(resourceRoot, extension.everyProtoBuilds)) {
+            if (!msgCodeBuild.buildEveryProtoCode(resourceRoot, extension.getEveryProtoBuilds())) {
                 throw new PluginTaskException("build everyProto code error");
             }
         } catch (Throwable e) {

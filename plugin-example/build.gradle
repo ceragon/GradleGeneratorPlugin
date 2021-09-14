@@ -4,27 +4,25 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.ceragon:plugin:1.0-SNAPSHOT'
+        classpath 'com.ceragon:plugin:0.1'
     }
 }
 
-apply plugin: 'com.ceragon.generator'
+apply plugin: 'com.ceragon.proto'
 
 
 proto {
-//    protoFilePaths = [
-//            baseDir("protofiles")
-//    ]
 
-    outputTargets = [
-            outputTarget {
-                type = "java"
-            }
-    ]
-    totalMsgBuilds = [
-            totalMsgBuild {
-                vmFile = "HOpCommand.vm"
-                targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
-            }
-    ]
+    outputTargets {
+        test {
+            type = "java"
+        }
+    }
+
+    totalMsgBuilds {
+        HOpCommand {
+            vmFile = "HOpCommand.vm"
+            targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
+        }
+    }
 }

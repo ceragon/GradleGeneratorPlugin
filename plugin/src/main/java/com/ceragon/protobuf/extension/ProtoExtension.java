@@ -3,39 +3,41 @@ package com.ceragon.protobuf.extension;
 import com.ceragon.PluginContext;
 import com.github.os72.protocjar.ProtocVersion;
 import groovy.lang.Closure;
+import lombok.Getter;
 import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.Nested;
 import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ProtoExtension {
     @Internal("protoc 的版本号")
-    public String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
+    private String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
 
     @Internal("proto 文件的目录")
-    public List<String> protoFilePaths;
+    private List<String> protoFilePaths;
 
     @Internal("输出配置")
-    public List<OutputTarget> outputTargets = new ArrayList<>();
+    private final NamedDomainObjectContainer<OutputTarget> outputTargets;
     @Internal("模板文件的目录")
-    public String templatePath;
-    @Nested
-    public List<TotalMsgBuildConfig> totalMsgBuilds = new ArrayList<>();
-    @Nested
-    public List<EveryMsgBuildConfig> everyMsgBuilds = new ArrayList<>();
-    @Nested
-    public List<EveryProtoBuildConfig> everyProtoBuilds = new ArrayList<>();
+    private String templatePath;
+    private final NamedDomainObjectContainer<TotalMsgBuildConfig> totalMsgBuilds;
+    private final NamedDomainObjectContainer<EveryMsgBuildConfig> everyMsgBuilds;
+    private final NamedDomainObjectContainer<EveryProtoBuildConfig> everyProtoBuilds;
 
     @Inject
     public ProtoExtension(Project project) {
         protoFilePaths = List.of(
                 PluginContext.pathFormat().format("${project.base.dir}${s}protofiles")
         );
+        outputTargets = project.container(OutputTarget.class);
+        totalMsgBuilds = project.container(TotalMsgBuildConfig.class);
+        everyMsgBuilds = project.container(EveryMsgBuildConfig.class);
+        everyProtoBuilds = project.container(EveryProtoBuildConfig.class);
         templatePath = PluginContext.pathFormat().format("${project.base.dir}${s}template");
     }
 
@@ -44,44 +46,36 @@ public class ProtoExtension {
         return PluginContext.pathFormat().format("${project.base.dir}${s}" + path);
     }
 
-    public OutputTarget outputTarget(Action<OutputTarget> action) {
-        OutputTarget outputTarget = new OutputTarget();
-        action.execute(outputTarget);
-        return outputTarget;
+    public void outputTargets(Closure<?> block) {
+        ConfigureUtil.configure(block, this.outputTargets);
     }
 
-    public OutputTarget outputTarget(Closure closure) {
-        return ConfigureUtil.configure(closure, new OutputTarget());
+    public void outputTargets(Action<NamedDomainObjectContainer<OutputTarget>> block) {
+        block.execute(this.outputTargets);
     }
 
-    public TotalMsgBuildConfig totalMsgBuild(Action<TotalMsgBuildConfig> action) {
-        TotalMsgBuildConfig config = new TotalMsgBuildConfig();
-        action.execute(config);
-        return config;
+    public void totalMsgBuilds(Closure<?> block) {
+        ConfigureUtil.configure(block, this.totalMsgBuilds);
     }
 
-    public TotalMsgBuildConfig totalMsgBuild(Closure closure) {
-        return ConfigureUtil.configure(closure, new TotalMsgBuildConfig());
+    public void totalMsgBuilds(Action<NamedDomainObjectContainer<TotalMsgBuildConfig>> block) {
+        block.execute(this.totalMsgBuilds);
     }
 
-    public EveryMsgBuildConfig everyMsgBuild(Action<EveryMsgBuildConfig> action) {
-        EveryMsgBuildConfig config = new EveryMsgBuildConfig();
-        action.execute(config);
-        return config;
+    public void everyMsgBuilds(Closure<?> block) {
+        ConfigureUtil.configure(block, this.everyMsgBuilds);
     }
 
-    public EveryMsgBuildConfig everyMsgBuild(Closure closure) {
-        return ConfigureUtil.configure(closure, new EveryMsgBuildConfig());
+    public void everyMsgBuilds(Action<NamedDomainObjectContainer<EveryMsgBuildConfig>> block) {
+        block.execute(this.everyMsgBuilds);
     }
 
-    public EveryProtoBuildConfig everyProtoBuild(Action<EveryProtoBuildConfig> action) {
-        EveryProtoBuildConfig config = new EveryProtoBuildConfig();
-        action.execute(config);
-        return config;
+    public void everyProtoBuilds(Closure<?> block) {
+        ConfigureUtil.configure(block, this.everyProtoBuilds);
     }
 
-    public EveryProtoBuildConfig everyProtoBuild(Closure closure) {
-        return ConfigureUtil.configure(closure, new EveryProtoBuildConfig());
+    public void everyProtoBuilds(Action<NamedDomainObjectContainer<EveryProtoBuildConfig>> block) {
+        block.execute(this.everyProtoBuilds);
     }
     //endregion
 }

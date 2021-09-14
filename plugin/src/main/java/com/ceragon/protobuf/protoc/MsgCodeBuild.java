@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -25,22 +26,23 @@ public class MsgCodeBuild {
     List<ProtoFileDescPojo> protoFileDescPojoList;
 
     //region -------- 使用全部消息的集合生成代码 ------------
-    public boolean buildTotalMsgCode(String resourceRoot, List<TotalMsgBuildConfig> configList) {
-        Logger log = PluginContext.log();
+    public boolean buildTotalMsgCode(String resourceRoot, Set<TotalMsgBuildConfig> configList) {
         Map<String, Object> content = new HashMap<>();
         List<ProtoMessageDescPojo> messageDescPojoList = protoFileDescPojoList.stream().flatMap(pojo -> pojo.getMessageList().stream())
                 .collect(Collectors.toList());
         content.put("totalMsgList", messageDescPojoList);
         content.put("totalMsgGroupList", protoFileDescPojoList);
-        return configList.stream().allMatch(config -> processTotalMsgCode(log, resourceRoot, config, content));
+        return configList.stream().allMatch(config -> processTotalMsgCode(resourceRoot, config, content));
     }
 
-    private boolean processTotalMsgCode(org.gradle.api.logging.Logger log, String resourceRoot, TotalMsgBuildConfig config, Map<String, Object> content) {
+    private boolean processTotalMsgCode(String resourceRoot, TotalMsgBuildConfig config, Map<String, Object> content) {
+        Logger log = PluginContext.log();
         PathFormat pathFormat = PluginContext.pathFormat();
         String sourceName = config.getVmFile();
         String destPath = pathFormat.format(config.getTargetFile());
         try {
             CodeGenTool.createCodeByPath(resourceRoot, sourceName, destPath, config.isOverwrite(), content);
+            log.info("totalMsgCode build success!");
             return true;
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -50,7 +52,7 @@ public class MsgCodeBuild {
     //endregion
 
     //region -------- 使用every消息的集合生成代码 ------------
-    public boolean buildEveryMsgCode(String resourceRoot, List<EveryMsgBuildConfig> everyMsg) {
+    public boolean buildEveryMsgCode(String resourceRoot, Set<EveryMsgBuildConfig> everyMsg) {
         return everyMsg.stream().allMatch(config -> processEveryMsgCodeConfig(resourceRoot, config));
     }
 
@@ -82,7 +84,7 @@ public class MsgCodeBuild {
 
     //endregion
 
-    public boolean buildEveryProtoCode(String resourceRoot, List<EveryProtoBuildConfig> everyProto) {
+    public boolean buildEveryProtoCode(String resourceRoot, Set<EveryProtoBuildConfig> everyProto) {
         return everyProto.stream().allMatch(config -> processEveryProtoCodeConfig(resourceRoot, config));
     }
 

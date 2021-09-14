@@ -1,9 +1,12 @@
 package com.ceragon.protobuf.extension;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class TotalMsgBuildConfig {
+    final String name;
     /**
      * 模板文件名称
      */
