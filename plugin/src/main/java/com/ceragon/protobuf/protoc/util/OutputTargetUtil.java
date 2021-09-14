@@ -42,13 +42,13 @@ public class OutputTargetUtil {
     public static void preprocessTarget(OutputTarget target) throws PluginTaskException {
         File f = new File(target.getOutputDirectory());
         if (!f.exists()) {
-            PluginContext.log().info(f + " does not exist. Creating...");
+            PluginContext.log().quiet(f + " does not exist. Creating...");
             f.mkdirs();
         }
 
         if (target.isCleanOutputFolder()) {
             try {
-                PluginContext.log().info("Cleaning " + f);
+                PluginContext.log().quiet("Cleaning " + f);
                 FileUtils.cleanDirectory(f);
             } catch (IOException e) {
                 PluginContext.log().error(e.getMessage(), e);
@@ -58,7 +58,6 @@ public class OutputTargetUtil {
 
     public static void processTarget(String protocCommand, final List<String> inputDirectoryList,
                                      final List<File> includeDirectoryList, final OutputTarget target) throws PluginTaskException {
-        Logger log = PluginContext.log();
         BuildContext context = PluginContext.buildContext();
         final String extension = context.getValue(ContextKey.PROTO_EXTENSION);
         final String protocVersion = context.getValue(ContextKey.PROTOC_VERSION);
@@ -80,18 +79,18 @@ public class OutputTargetUtil {
                         processFile(includeDirectoryList, protocCommand, protoFile, targetType, null,
                                 target.getOutputDirectory(), target.getOutputOptions());
                     } else {
-                        log.info("Not changed " + protoFile);
+                        PluginContext.log().quiet("Not changed " + protoFile);
                     }
                 }
             } else {
-                if (inputFile.exists()) log.warn(input + " is not a directory");
-                else log.warn(input + " does not exist");
+                if (inputFile.exists()) PluginContext.log().quiet(input + " is not a directory");
+                else PluginContext.log().quiet(input + " does not exist");
             }
         }
 
         if (shaded) {
             try {
-                log.info("    Shading (version " + protocVersion + "): " + target.getOutputDirectory());
+                PluginContext.log().quiet("    Shading (version " + protocVersion + "): " + target.getOutputDirectory());
                 Protoc.doShading(new File(target.getOutputDirectory()), protocVersion);
             } catch (IOException e) {
                 throw new PluginTaskException("Error occurred during shading", e);
@@ -102,8 +101,7 @@ public class OutputTargetUtil {
     private static void processFile(final List<File> includeDirectories, final String protocCommand, final File file,
                                     final String type, final String pluginPath, final String outputDir,
                                     final String outputOptions) throws PluginTaskException {
-        Logger log = PluginContext.log();
-        log.info("    Processing (" + type + "): " + file.getName());
+        PluginContext.log().quiet("    Processing (" + type + "): " + file.getName());
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -151,7 +149,6 @@ public class OutputTargetUtil {
 
     private static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
                                                    String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
-        Logger log = PluginContext.log();
         BuildContext context = PluginContext.buildContext();
         final String version = context.getValue(ContextKey.PROTOC_VERSION);
         final boolean includeImports = context.getValue(ContextKey.INCLUDE_IMPORTS);
@@ -175,7 +172,7 @@ public class OutputTargetUtil {
             }
 
             if (pluginPath != null) {
-                log.info("    Plugin path: " + pluginPath);
+                PluginContext.log().quiet("    Plugin path: " + pluginPath);
                 cmd.add("--plugin=protoc-gen-" + type + "=" + pluginPath);
             }
         }

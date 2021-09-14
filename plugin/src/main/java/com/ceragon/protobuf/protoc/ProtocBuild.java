@@ -13,13 +13,10 @@ import com.ceragon.util.StringUtils;
 import com.github.os72.protocjar.ProtocVersion;
 import lombok.Builder;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
-
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Builder
 public class ProtocBuild {
@@ -34,7 +31,6 @@ public class ProtocBuild {
 
     public void process(List<OutputTarget> outputTargets) throws PluginTaskException {
         BuildContext context = PluginContext.buildContext();
-        Logger log = PluginContext.log();
         final Project project = PluginContext.project();
         // 默认值
         if (StringUtils.isEmpty(protocVersion)) {

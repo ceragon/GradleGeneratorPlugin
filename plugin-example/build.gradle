@@ -1,10 +1,11 @@
 buildscript {
     repositories {
         mavenLocal()
+        maven { url 'https://maven.aliyun.com/repository/central' }
         mavenCentral()
     }
     dependencies {
-        classpath 'com.ceragon:plugin:0.1'
+        classpath 'com.ceragon:plugin:1.0-SNAPSHOT'
     }
 }
 

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class CommandUtil {
     public static String buildProtocExe(final String protocVersion) throws PluginTaskException {
-        PluginContext.log().info("Protoc version: " + protocVersion);
+        PluginContext.log().quiet("Protoc version: " + protocVersion);
         String protocCommand;
         try {
             File protocFile = Protoc.extractProtoc(ProtocVersion.getVersion("-v" + protocVersion), false);

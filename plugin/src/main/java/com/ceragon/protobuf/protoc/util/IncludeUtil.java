@@ -22,7 +22,6 @@ import java.util.zip.ZipInputStream;
 
 public class IncludeUtil {
     public static List<File> buildIncludePath(final boolean includeStdTypes, final File[] includeDirectories) throws PluginTaskException {
-        Logger log = PluginContext.log();
         final String protocVersion = PluginContext.buildContext().getValue(ContextKey.PROTOC_VERSION);
         List<File> includeDirectoryList;
         if (includeDirectories != null) {
@@ -38,7 +37,7 @@ public class IncludeUtil {
         try {
             File extraTypeDir = new File(tmpDir, "include");
             extraTypeDir.mkdir();
-            log.info("Additional include types: " + extraTypeDir);
+            PluginContext.log().quiet("Additional include types: " + extraTypeDir);
             includeDirectoryList.add(extraTypeDir);
             if (includeStdTypes) {
                 Protoc.extractStdTypes(ProtocVersion.getVersion("-v" + protocVersion), tmpDir); // yes, tmpDir

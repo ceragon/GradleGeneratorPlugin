@@ -11,7 +11,6 @@ import com.ceragon.util.CodeGenTool;
 import com.ceragon.util.PathFormat;
 import com.ceragon.util.VelocityUtil;
 import lombok.Value;
-import org.gradle.api.logging.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,16 +35,15 @@ public class MsgCodeBuild {
     }
 
     private boolean processTotalMsgCode(String resourceRoot, TotalMsgBuildConfig config, Map<String, Object> content) {
-        Logger log = PluginContext.log();
         PathFormat pathFormat = PluginContext.pathFormat();
         String sourceName = config.getVmFile();
         String destPath = pathFormat.format(config.getTargetFile());
         try {
             CodeGenTool.createCodeByPath(resourceRoot, sourceName, destPath, config.isOverwrite(), content);
-            log.info("totalMsgCode build success!");
+            PluginContext.log().quiet("totalMsgCode generate success!name={}", config.getName());
             return true;
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            PluginContext.log().error(e.getMessage(), e);
             return false;
         }
     }
@@ -75,6 +73,7 @@ public class MsgCodeBuild {
             content.put("util", VelocityUtil.getInstance());
             String destPath = PluginContext.pathFormat().format(config.getTargetFile(), "MsgName", protoMessagePojo.getName());
             CodeGenTool.createCodeByPath(resourceRoot, config.getVmFile(), destPath, config.isOverwrite(), content);
+            PluginContext.log().quiet("everyMsgCode generate success!name={}", config.getName());
             return true;
         } catch (IOException e) {
             PluginContext.log().error(e.getMessage(), e);
@@ -101,6 +100,8 @@ public class MsgCodeBuild {
             content.put("util", VelocityUtil.getInstance());
             String destPath = PluginContext.pathFormat().format(config.getTargetFile());
             CodeGenTool.createCodeByPath(resourceRoot, config.getVmFile(), destPath, config.isOverwrite(), content);
+
+            PluginContext.log().quiet("everyProtoCode generate success!name={}", config.getName());
             return true;
         } catch (IOException e) {
             PluginContext.log().error(e.getMessage(), e);
