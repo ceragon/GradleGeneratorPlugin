@@ -10,6 +10,7 @@
 dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.17.3'
     implementation 'com.github.os72:protoc-jar:3.11.4'
+    implementation group: 'com.alibaba', name: 'easyexcel', version: '2.2.10'
     implementation project(':common')
 }
 

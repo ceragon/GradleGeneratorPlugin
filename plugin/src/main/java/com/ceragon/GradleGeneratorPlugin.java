@@ -22,6 +22,5 @@ public class GradleGeneratorPlugin implements Plugin<Project> {
         project.getTasks().register("proto", task -> task.doLast(protoGeneratorTask::execute));
         PluginContext.buildContext().clear();
 
-
     }
 }
