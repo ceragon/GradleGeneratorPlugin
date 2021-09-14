@@ -8,6 +8,7 @@ import com.ceragon.protobuf.protoc.MsgCodeBuild;
 import com.ceragon.protobuf.protoc.ProtocBuild;
 import com.ceragon.util.PluginTaskException;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskExecutionException;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class ProtoGeneratorTask {
                 throw new PluginTaskException("build everyProto code error");
             }
         } catch (Throwable e) {
-            task.getLogger().error(e.getMessage(), e);
+            throw new TaskExecutionException(task, e);
         }
     }
 

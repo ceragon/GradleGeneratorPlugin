@@ -5,6 +5,7 @@ import com.github.os72.protocjar.ProtocVersion;
 import groovy.lang.Closure;
 import org.gradle.api.Action;
 import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.Nested;
 import org.gradle.util.internal.ConfigureUtil;
 
 import java.util.ArrayList;
@@ -21,8 +22,11 @@ public class ProtoExtension {
     public List<OutputTarget> outputTargets = new ArrayList<>();
     @Internal("模板文件的目录")
     public String templatePath;
+    @Nested
     public List<TotalMsgBuildConfig> totalMsgBuilds = new ArrayList<>();
+    @Nested
     public List<EveryMsgBuildConfig> everyMsgBuilds = new ArrayList<>();
+    @Nested
     public List<EveryProtoBuildConfig> everyProtoBuilds = new ArrayList<>();
 
     public ProtoExtension() {
