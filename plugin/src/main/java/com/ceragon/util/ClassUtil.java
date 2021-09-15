@@ -85,7 +85,7 @@ public class ClassUtil {
                     url = list.nextElement();
                     protocol = url.getProtocol();
                     if ("file".equals(protocol)) {
-                        filePath = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8);
+                        filePath = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name());
                         Set<Class<?>> value = scanFiles(packageName, filePath, annClazz);
                         if (value != null) {
                             classes.addAll(value);

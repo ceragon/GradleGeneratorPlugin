@@ -4,7 +4,6 @@ import com.ceragon.PluginContext;
 import com.github.os72.protocjar.ProtocVersion;
 import groovy.lang.Closure;
 import lombok.Data;
-import lombok.Getter;
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
@@ -12,6 +11,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -35,7 +35,7 @@ public class ProtoExtension {
 
     @Inject
     public ProtoExtension(Project project) {
-        protoFilePaths = List.of(
+        protoFilePaths = Collections.singletonList(
                 PluginContext.pathFormat().format("${project.base.dir}${s}protofiles")
         );
         outputTargets = project.container(OutputTarget.class);

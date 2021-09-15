@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
-        maven { url 'https://maven.aliyun.com/repository/central' }
+//        maven { url 'https://maven.aliyun.com/repository/central' }
         mavenCentral()
     }
     dependencies {
@@ -15,15 +15,9 @@ apply plugin: 'com.ceragon.proto'
 proto {
 
     outputTargets {
-        test {
+        javaCode {
             type = "java"
         }
     }
 
-    totalMsgBuilds {
-        HOpCommand {
-            vmFile = "HOpCommand.vm"
-            targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
-        }
-    }
 }

@@ -3,6 +3,7 @@ package com.ceragon.table.extension;
 import com.ceragon.PluginContext;
 import org.gradle.api.tasks.Internal;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TableExtension {
@@ -10,7 +11,7 @@ public class TableExtension {
     public List<String> tableFilePaths;
 
     public TableExtension() {
-        this.tableFilePaths = List.of(
+        this.tableFilePaths = Collections.singletonList(
                 PluginContext.pathFormat().format("${project.base.dir}${s}tableFiles")
         );
     }

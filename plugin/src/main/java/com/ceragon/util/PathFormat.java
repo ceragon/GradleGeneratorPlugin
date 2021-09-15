@@ -16,7 +16,7 @@ public class PathFormat {
 
         String projectSrcDir = project.getBuildDir().getPath();
         String projectBaseDir = project.getProjectDir().getPath();
-        this.basicVar = Map.of(
+        this.basicVar = Maps.of(
                 PROJECT_BUILD_DIR, projectSrcDir,
                 PROJECT_BASE_DIR, projectBaseDir,
                 SEPARATOR, File.separator
@@ -29,7 +29,7 @@ public class PathFormat {
     }
 
     public String format(String sourcePath, String key, Object value) {
-        return format(sourcePath, Map.of(key, value, key.toLowerCase(), value, key.toUpperCase(), value));
+        return format(sourcePath, Maps.of(key, value, key.toLowerCase(), value, key.toUpperCase(), value));
     }
 
     public String format(String sourcePath, Map<String, Object> params) {
