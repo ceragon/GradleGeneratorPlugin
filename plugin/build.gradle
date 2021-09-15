@@ -20,8 +20,8 @@ gradlePlugin {
     // Define the plugin
     plugins {
         protoPlugin {
-            id = 'com.ceragon.proto'
-            implementationClass = 'com.ceragon.GradleProtoPlugin'
+            id = 'io.github.ceragon.proto'
+            implementationClass = 'io.github.ceragon.GradleProtoPlugin'
         }
     }
 }
@@ -36,7 +36,7 @@ pluginBundle {
             displayName = 'Gradle proto generate plugin'
             description = "generate code from protobuf file"
             tags = ['protobuf']
-            version = '0.1'
+            version = '1.0'
         }
     }
 }

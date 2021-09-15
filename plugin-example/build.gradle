@@ -5,11 +5,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.ceragon:plugin:1.0-SNAPSHOT'
+        classpath 'io.github.ceragon:plugin:1.0'
     }
 }
 
-apply plugin: 'com.ceragon.proto'
+apply plugin: 'io.github.ceragon.proto'
 
 
 proto {

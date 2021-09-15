@@ -9,8 +9,8 @@ subprojects {
         }
     }
 
-    group = "com.ceragon"
-    version = "1.0-SNAPSHOT"
+    group = "io.github.ceragon"
+    version = "1.0"
 
     repositories {
         // Use Maven Central for resolving dependencies.

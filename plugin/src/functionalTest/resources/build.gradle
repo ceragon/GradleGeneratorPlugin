@@ -1,11 +1,11 @@
 plugins {
-    id('com.ceragon.generator')
+    id('io.github.ceragon.proto')
 }
 
 proto {
-    outputTargets = [
-            outputTarget {
-                type = "java"
-            }
-    ]
+    outputTargets {
+        javaCode {
+            type = "java"
+        }
+    }
 }
