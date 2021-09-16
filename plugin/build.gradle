@@ -76,7 +76,7 @@ task javadocs(type: Javadoc) {
     include("**/io/github/ceragon/protobuf/bean/**")
     include("**/io/github/ceragon/util/TemplateUtil.java")
     // 生成文档的目标目录
-    destinationDir = new File(buildDir, "docs")
+    destinationDir = new File(rootDir, "docs")
     // 默认值
     classpath = sourceSets.main.compileClasspath
     // 设置发生错误不会导致生成文档失败
