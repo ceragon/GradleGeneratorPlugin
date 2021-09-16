@@ -67,3 +67,21 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+
+
+// 生成Java类的HTML API文档
+task javadocs(type: Javadoc) {
+    // 默认值
+    source = sourceSets.main.allJava
+    include("**/io/github/ceragon/protobuf/bean/**")
+    include("**/io/github/ceragon/util/TemplateUtil.java")
+    // 生成文档的目标目录
+    destinationDir = new File(buildDir, "docs")
+    // 默认值
+    classpath = sourceSets.main.compileClasspath
+    // 设置发生错误不会导致生成文档失败
+    failOnError = false
+    options {
+        encoding('UTF-8')
+    }
+}

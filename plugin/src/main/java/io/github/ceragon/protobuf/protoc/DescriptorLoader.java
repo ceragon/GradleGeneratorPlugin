@@ -1,8 +1,8 @@
 package io.github.ceragon.protobuf.protoc;
 
-import io.github.ceragon.protobuf.bean.ProtoFieldPojo;
-import io.github.ceragon.protobuf.bean.ProtoFileDescPojo;
-import io.github.ceragon.protobuf.bean.ProtoMessageDescPojo;
+import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
+import io.github.ceragon.protobuf.bean.ProtoFileDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
 import io.github.ceragon.util.FileFilter;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class DescriptorLoader {
-    public static List<ProtoFileDescPojo> loadDesc(String descPathStr) {
+    public static List<ProtoFileDesc> loadDesc(String descPathStr) {
         File descPath = new File(descPathStr);
         FileFilter fileFilter = new FileFilter(".desc");
-        List<ProtoFileDescPojo> fileDescPojos = new ArrayList<>();
+        List<ProtoFileDesc> fileDescPojos = new ArrayList<>();
         if (!FileUtils.listFiles(descPath, fileFilter, TrueFileFilter.INSTANCE).stream()
                 .allMatch(file -> buildFileDesc(fileDescPojos, file))) {
             return Collections.emptyList();
@@ -32,26 +32,26 @@ public class DescriptorLoader {
         return fileDescPojos;
     }
 
-    private static boolean buildFileDesc(List<ProtoFileDescPojo> protoFileDescPojoList, File descFile) {
+    private static boolean buildFileDesc(List<ProtoFileDesc> protoFileDescList, File descFile) {
         try (FileInputStream fin = new FileInputStream(descFile)) {
             FileDescriptorSet descriptorSet = FileDescriptorSet.parseFrom(fin);
             for (FileDescriptorProto fdp : descriptorSet.getFileList()) {
-                ProtoFileDescPojo.ProtoFileDescPojoBuilder fileDescPojoBuilder = ProtoFileDescPojo.builder()
+                ProtoFileDesc.ProtoFileDescBuilder fileDescPojoBuilder = ProtoFileDesc.builder()
                         .orig(fdp);
                 if (fdp.getMessageTypeCount() < 1) {
-                    protoFileDescPojoList.add(fileDescPojoBuilder.build());
+                    protoFileDescList.add(fileDescPojoBuilder.build());
                     continue;
                 }
                 FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{});
                 for (Descriptor descriptor : fd.getMessageTypes()) {
-                    ProtoMessageDescPojo.ProtoMessageDescPojoBuilder messageBuilder = ProtoMessageDescPojo.builder()
+                    ProtoMessageDesc.ProtoMessageDescBuilder messageBuilder = ProtoMessageDesc.builder()
                             .orig(descriptor);
                     for (FieldDescriptor fieldDescriptor : descriptor.getFields()) {
-                        messageBuilder.field(ProtoFieldPojo.builder().orig(fieldDescriptor).build());
+                        messageBuilder.field(ProtoMessageFieldDesc.builder().orig(fieldDescriptor).build());
                     }
                     fileDescPojoBuilder.message(messageBuilder.build());
                 }
-                protoFileDescPojoList.add(fileDescPojoBuilder.build());
+                protoFileDescList.add(fileDescPojoBuilder.build());
             }
             return true;
         } catch (IOException | DescriptorValidationException e) {

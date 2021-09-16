@@ -1,6 +1,6 @@
 package io.github.ceragon.protobuf;
 
-import io.github.ceragon.protobuf.bean.ProtoFileDescPojo;
+import io.github.ceragon.protobuf.bean.ProtoFileDesc;
 import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.extension.ProtoExtension;
 import io.github.ceragon.protobuf.protoc.DescriptorLoader;
@@ -38,9 +38,9 @@ public class ProtoGeneratorTask {
             // 生成目标proto格式，以及描述信息
             protocBuild.process(outputTargets);
             // 加载描述信息
-            List<ProtoFileDescPojo> protoFileDescPojoList = DescriptorLoader.loadDesc(descriptorTarget.getOutputDirectory());
+            List<ProtoFileDesc> protoFileDescList = DescriptorLoader.loadDesc(descriptorTarget.getOutputDirectory());
 
-            MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescPojoList);
+            MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescList);
 
             String resourceRoot = extension.getTemplatePath();
 

@@ -2,14 +2,14 @@ package io.github.ceragon.protobuf.protoc;
 
 
 import io.github.ceragon.PluginContext;
-import io.github.ceragon.protobuf.bean.ProtoFileDescPojo;
-import io.github.ceragon.protobuf.bean.ProtoMessageDescPojo;
+import io.github.ceragon.protobuf.bean.ProtoFileDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
 import io.github.ceragon.protobuf.extension.EveryMsgBuildConfig;
 import io.github.ceragon.protobuf.extension.EveryProtoBuildConfig;
 import io.github.ceragon.protobuf.extension.TotalMsgBuildConfig;
 import io.github.ceragon.util.CodeGenTool;
 import io.github.ceragon.util.PathFormat;
-import io.github.ceragon.util.VelocityUtil;
+import io.github.ceragon.util.TemplateUtil;
 import lombok.Value;
 
 import java.io.IOException;
@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 
 @Value
 public class MsgCodeBuild {
-    List<ProtoFileDescPojo> protoFileDescPojoList;
+    List<ProtoFileDesc> protoFileDescList;
 
     //region -------- 使用全部消息的集合生成代码 ------------
     public boolean buildTotalMsgCode(String resourceRoot, Set<TotalMsgBuildConfig> configList) {
         Map<String, Object> content = new HashMap<>();
-        List<ProtoMessageDescPojo> messageDescPojoList = protoFileDescPojoList.stream().flatMap(pojo -> pojo.getMessageList().stream())
+        List<ProtoMessageDesc> messageDescPojoList = protoFileDescList.stream().flatMap(pojo -> pojo.getMessageList().stream())
                 .collect(Collectors.toList());
         content.put("totalMsgList", messageDescPojoList);
-        content.put("totalMsgGroupList", protoFileDescPojoList);
+        content.put("totalMsgGroupList", protoFileDescList);
         return configList.stream().allMatch(config -> processTotalMsgCode(resourceRoot, config, content));
     }
 
@@ -55,22 +55,22 @@ public class MsgCodeBuild {
     }
 
     private boolean processEveryMsgCodeConfig(String resourceRoot, EveryMsgBuildConfig config) {
-        return this.protoFileDescPojoList.stream()
+        return this.protoFileDescList.stream()
                 .filter(pojo -> config.getProtoNameMatch().stream().anyMatch(protoNameMatch -> pojo.getName().matches(protoNameMatch)))
                 .allMatch(pojo -> processEveryMsgCodePojoAndConfig(resourceRoot, pojo, config));
     }
 
-    private boolean processEveryMsgCodePojoAndConfig(String resourceRoot, ProtoFileDescPojo pojo, EveryMsgBuildConfig config) {
+    private boolean processEveryMsgCodePojoAndConfig(String resourceRoot, ProtoFileDesc pojo, EveryMsgBuildConfig config) {
         return pojo.getMessageList().stream()
                 .filter(protoMessagePojo -> config.getMsgNameMatch().stream().anyMatch(msgNameMatch -> protoMessagePojo.getName().matches(msgNameMatch)))
                 .allMatch(protoMessagePojo -> processEveryMsgCode(resourceRoot, protoMessagePojo, config));
     }
 
-    private boolean processEveryMsgCode(String resourceRoot, ProtoMessageDescPojo protoMessagePojo, EveryMsgBuildConfig config) {
+    private boolean processEveryMsgCode(String resourceRoot, ProtoMessageDesc protoMessagePojo, EveryMsgBuildConfig config) {
         try {
             Map<String, Object> content = new HashMap<>();
             content.put("msg", protoMessagePojo);
-            content.put("util", VelocityUtil.getInstance());
+            content.put("util", TemplateUtil.getInstance());
             String destPath = PluginContext.pathFormat().format(config.getTargetFile(), "MsgName", protoMessagePojo.getName());
             CodeGenTool.createCodeByPath(resourceRoot, config.getVmFile(), destPath, config.isOverwrite(), content);
             PluginContext.log().quiet("everyMsgCode generate success!name={}", config.getName());
@@ -88,16 +88,16 @@ public class MsgCodeBuild {
     }
 
     private boolean processEveryProtoCodeConfig(String resourceRoot, EveryProtoBuildConfig config) {
-        return this.protoFileDescPojoList.stream()
+        return this.protoFileDescList.stream()
                 .filter(pojo -> config.getProtoNameMatch().stream().anyMatch(protoNameMatch -> pojo.getName().matches(protoNameMatch)))
                 .allMatch(pojo -> processEveryProtoCode(resourceRoot, pojo, config));
     }
 
-    private boolean processEveryProtoCode(String resourceRoot, ProtoFileDescPojo protoFileDescPojo, EveryProtoBuildConfig config) {
+    private boolean processEveryProtoCode(String resourceRoot, ProtoFileDesc protoFileDesc, EveryProtoBuildConfig config) {
         try {
             Map<String, Object> content = new HashMap<>();
-            content.put("proto", protoFileDescPojo);
-            content.put("util", VelocityUtil.getInstance());
+            content.put("proto", protoFileDesc);
+            content.put("util", TemplateUtil.getInstance());
             String destPath = PluginContext.pathFormat().format(config.getTargetFile());
             CodeGenTool.createCodeByPath(resourceRoot, config.getVmFile(), destPath, config.isOverwrite(), content);
 
