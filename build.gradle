@@ -44,7 +44,7 @@ subprojects {
 
     publishing {
         repositories {
-            mavenLocal()
+            // mavenLocal()
             maven {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ceragon/GradleGeneratorPlugin")
