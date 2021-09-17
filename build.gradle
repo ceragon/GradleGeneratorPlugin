@@ -44,15 +44,15 @@ subprojects {
 
     publishing {
         repositories {
-            // mavenLocal()
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/ceragon/GradleGeneratorPlugin")
-                credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-                }
-            }
+            mavenLocal()
+//            maven {
+//                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/ceragon/GradleGeneratorPlugin")
+//                credentials {
+//                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+//                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+//                }
+//            }
         }
         publications {
             gpr(MavenPublication) {
