@@ -42,6 +42,15 @@ subprojects {
         options.encoding = "UTF-8"
     }
 
+    task sourcesJar(type: Jar) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
     publishing {
         repositories {
             mavenLocal()
@@ -54,10 +63,10 @@ subprojects {
 //                }
 //            }
         }
-        publications {
-            gpr(MavenPublication) {
-                from(components.java)
-            }
-        }
+//        publications {
+//            gpr(MavenPublication) {
+//                from(components.java)
+//            }
+//        }
     }
 }
