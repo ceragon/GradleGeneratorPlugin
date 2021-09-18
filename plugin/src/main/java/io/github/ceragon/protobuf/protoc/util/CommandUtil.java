@@ -9,9 +9,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class CommandUtil {
-    public static String buildProtocExe(final String protocVersion) throws PluginTaskException {
+    public static String buildProtocExe(String protocCommand, final String protocVersion) throws PluginTaskException {
+        if (protocCommand != null) {
+            try {
+                Protoc.runProtoc(protocCommand, new String[]{"--version"});
+                return protocCommand;
+            } catch (Exception e) {
+                throw new PluginTaskException("the protocCommand is not available", e);
+            }
+        }
         PluginContext.log().quiet("Protoc version: " + protocVersion);
-        String protocCommand;
         try {
             File protocFile = Protoc.extractProtoc(ProtocVersion.getVersion("-v" + protocVersion), false);
             protocCommand = protocFile.getAbsolutePath();
@@ -28,7 +35,6 @@ public class CommandUtil {
         }
         return protocCommand;
     }
-
 
 
 }

@@ -24,6 +24,7 @@ public class ProtocBuild {
     private static final String DEFAULT_INPUT_DIR = "/src/main/resources/".replace('/', File.separatorChar);
 
     String protocVersion;
+    String protocCommand;
     List<String> inputDirectories;
     File[] includeDirectories;
     boolean includeStdTypes;
@@ -51,7 +52,7 @@ public class ProtocBuild {
         outputTargets.forEach(OutputTargetUtil::initTarget);
 
         // 封装protoc的程序完整路径
-        String protocCommand = CommandUtil.buildProtocExe(protocVersion);
+        String protocCommand = CommandUtil.buildProtocExe(this.protocCommand, protocVersion);
 
         List<File> includeDirectoryList = IncludeUtil.buildIncludePath(includeStdTypes, includeDirectories);
 
@@ -63,6 +64,4 @@ public class ProtocBuild {
             OutputTargetUtil.processTarget(protocCommand, inputDirectories, includeDirectoryList, target);
         }
     }
-
-
 }

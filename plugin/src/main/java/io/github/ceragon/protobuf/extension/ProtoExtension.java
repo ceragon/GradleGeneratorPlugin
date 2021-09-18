@@ -18,7 +18,8 @@ import java.util.List;
 public class ProtoExtension {
     @Internal("protoc 的版本号")
     private String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
-
+    @Internal("自定义的protoc路径")
+    private String protocCommand;
     @Internal("proto 文件的目录")
     private List<String> protoFilePaths;
 
