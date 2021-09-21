@@ -10,4 +10,3 @@
 rootProject.name = 'GradlePlugin'
 include('plugin')
 
-
