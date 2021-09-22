@@ -55,19 +55,28 @@ subprojects {
     publishing {
         repositories {
             mavenLocal()
-//            maven {
-//                name = "GitHubPackages"
-//                url = uri("https://maven.pkg.github.com/ceragon/GradleGeneratorPlugin")
-//                credentials {
-//                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-//                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-//                }
-//            }
         }
-//        publications {
-//            gpr(MavenPublication) {
-//                from(components.java)
-//            }
-//        }
     }
+
+
+}
+
+task copySimpleExample(type: Copy) {
+    from('plugin-example') {
+        include 'gradle/**'
+        include 'protofiles/**'
+        include 'build.gradle'
+        include 'gradlew'
+        include 'gradlew.bat'
+        include 'proto-build.bat'
+        include 'proto-build.sh'
+        include 'settings.gradle'
+    }
+    into('build/example/proto-simple')
+}
+
+task zipSimpleExample(type: Zip, dependsOn: copySimpleExample) {
+    from('build/example/proto-simple')
+    destinationDirectory = layout.buildDirectory.dir("example")
+    archiveFileName = "proto-simple.zip"
 }
