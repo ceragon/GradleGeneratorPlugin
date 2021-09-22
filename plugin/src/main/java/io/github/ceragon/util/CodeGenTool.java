@@ -21,7 +21,6 @@ public class CodeGenTool {
         VelocityEngine ve = new VelocityEngine();
         ve.setProperty(VelocityEngine.INPUT_ENCODING, "UTF-8");
         ve.setProperty(VelocityEngine.FILE_RESOURCE_LOADER_PATH, sourcePath);
-        ve.setProperty("globbing.resource.loader.class", "StructuredGlobbingResourceLoader");
         ve.init();
         createCode(ve, sourceName, desPath, overwrite, content);
     }
