@@ -27,9 +27,12 @@ public class OutputTargetUtil {
 
         if (target.getOutputDirectory() == null) {
             String subdir = "generated-" + ("test".equals(target.getAddSources()) ? "test-" : "") + "sources";
-            target.setOutputDirectory(
-                    PluginContext.project().getBuildDir().getPath() + File.separator + subdir + File.separator
-            );
+            String taskName = target.getName();
+            String path = PluginContext.project().getBuildDir().getPath() + File.separator + subdir + File.separator;
+            if (taskName != null){
+                path += taskName;
+            }
+            target.setOutputDirectory(path);
         }
 
         if (target.getOutputDirectorySuffix() != null) {

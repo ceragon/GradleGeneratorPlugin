@@ -33,7 +33,7 @@ public class ProtoGeneratorTask {
                     .includeImports(false)
                     .build();
             List<OutputTarget> outputTargets = new ArrayList<>(extension.getOutputTargets());
-            OutputTarget descriptorTarget = new OutputTarget("");
+            OutputTarget descriptorTarget = new OutputTarget("descriptor");
             descriptorTarget.setType("descriptor");
             outputTargets.add(descriptorTarget);
             // 生成目标proto格式，以及描述信息
