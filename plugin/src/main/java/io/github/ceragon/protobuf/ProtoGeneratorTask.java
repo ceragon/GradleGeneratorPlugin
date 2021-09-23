@@ -27,6 +27,7 @@ public class ProtoGeneratorTask {
 
             ProtocBuild protocBuild = ProtocBuild.builder()
                     .protocVersion(extension.getProtocVersion())
+                    .protocCommand(extension.getProtocCommand())
                     .inputDirectories(extension.getProtoFilePaths())
                     .includeStdTypes(true)
                     .includeImports(false)
