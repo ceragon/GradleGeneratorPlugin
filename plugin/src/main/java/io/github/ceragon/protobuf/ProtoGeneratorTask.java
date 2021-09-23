@@ -23,7 +23,7 @@ public class ProtoGeneratorTask {
     public void execute(Task task) {
         try {
             PluginTaskException.taskNameLocal.set(task.getName());
-            prepareExecute();
+            prepareExecute(task);
 
             ProtocBuild protocBuild = ProtocBuild.builder()
                     .protocVersion(extension.getProtocVersion())
@@ -59,7 +59,13 @@ public class ProtoGeneratorTask {
         }
     }
 
-    private void prepareExecute() {
+    private void prepareExecute(Task task) {
+        if (extension.getDeleteFiles() != null) {
+            task.getProject().delete(extension.getDeleteFiles());
+        }
+        if (extension.getDeleteAction() != null) {
+            task.getProject().delete(extension.getDeleteAction());
+        }
         if ("Mac OS X".equals(System.getProperty("os.name"))
                 && "aarch64".equals(System.getProperty("os.arch"))) {
             // 苹果m1电脑，改为x86_64 架构

@@ -1,12 +1,13 @@
 package io.github.ceragon.protobuf.extension;
 
-import io.github.ceragon.PluginContext;
 import com.github.os72.protocjar.ProtocVersion;
 import groovy.lang.Closure;
+import io.github.ceragon.PluginContext;
 import lombok.Data;
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
+import org.gradle.api.file.DeleteSpec;
 import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
@@ -16,6 +17,9 @@ import java.util.List;
 
 @Data
 public class ProtoExtension {
+    @Internal("需要删除的文件列表")
+    private Object[] deleteFiles;
+    private Action<? super DeleteSpec> deleteAction;
     @Internal("protoc 的版本号")
     private String protocVersion = ProtocVersion.PROTOC_VERSION.mVersion;
     @Internal("自定义的protoc路径")
@@ -49,6 +53,14 @@ public class ProtoExtension {
     //region 闭包方法区
     public String baseDir(String path) {
         return PluginContext.pathFormat().format("${project.base.dir}${s}" + path);
+    }
+
+    public void deleteFile(Object... targetFile) {
+        this.deleteFiles = targetFile;
+    }
+
+    public void deleteFile(Action<? super DeleteSpec> deleteAction) {
+        this.deleteAction = deleteAction;
     }
 
     public void outputTargets(Closure<?> block) {
