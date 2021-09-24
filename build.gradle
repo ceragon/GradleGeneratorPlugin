@@ -65,7 +65,7 @@ task copySimpleExample(type: Copy) {
     from('plugin-example') {
         include 'gradle/**'
         include 'protofiles/**'
-        include 'build.gradle'
+        include 'simple-build.gradle'
         include 'gradlew'
         include 'gradlew.bat'
         include 'proto-build.bat'
@@ -73,10 +73,45 @@ task copySimpleExample(type: Copy) {
         include 'settings.gradle'
     }
     into('build/example/proto-simple')
+    rename('simple-build.gradle', 'build.gradle')
 }
 
 task zipSimpleExample(type: Zip, dependsOn: copySimpleExample) {
     from('build/example/proto-simple')
     destinationDirectory = layout.buildDirectory.dir("example")
     archiveFileName = "proto-simple.zip"
+}
+
+task copyFullExample(type: Copy) {
+    from('plugin-example') {
+        include 'gradle/**'
+        include 'protofiles/**'
+        include 'template/**'
+        include 'full-build.gradle'
+        include 'gradlew'
+        include 'gradlew.bat'
+        include 'proto-build.bat'
+        include 'proto-build.sh'
+        include 'settings.gradle'
+    }
+    into('build/example/proto-full')
+    rename('full-build.gradle', 'build.gradle')
+}
+
+task zipFullExample(type: Zip, dependsOn: copyFullExample) {
+    from('build/example/proto-full')
+    destinationDirectory = layout.buildDirectory.dir("example")
+    archiveFileName = "proto-full.zip"
+}
+
+task cleanExample() {
+    doLast {
+        delete('build/example')
+    }
+}
+
+task zipAllExample(dependsOn: [cleanExample, zipSimpleExample, zipFullExample]) {
+    doLast {
+        println 'success'
+    }
 }

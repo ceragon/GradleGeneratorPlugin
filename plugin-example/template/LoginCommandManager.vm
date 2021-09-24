@@ -27,12 +27,12 @@ public class LoginCommandManager implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         this.commandMap = new TIntObjectHashMap<>();
-#set($messageList = $proto.messageList)
-#foreach($message in $messageList)
-#if($util.endsWith($message.name, "request"))
+        #set($messageList = $proto.messageList)
+        #foreach($message in $messageList)
+            #if($util.endsWith($message.name, "request"))
         this.commandMap.put(HOpCommand.${message.name}, context.getBean(${message.name}Command.class));
-#end
-#end
+            #end
+        #end
     }
 
     public void runCommand(Channel channel, int commandId, CSPacket packet) {

@@ -2,20 +2,20 @@ package com.ceragon.monkeygame.proto;
 
 public class HOpCommand {
 #foreach($msgGroup in $totalMsgGroupList)
-    // -----------------${msgGroup.name}--------------
-#set($maxId = 0)
-#foreach($msg in $msgGroup.messageList)
-#set($msgId = $msg.getOptionInt(5000))
-#if($msgId != 0)
-#if($msgId > $maxId)
-    #set($maxId = $msgId)
-#end
+// -----------------${msgGroup.name}--------------
+    #set($maxId = 0)
+    #foreach($msg in $msgGroup.messageList)
+        #set($msgId = $msg.getOptionInt(5000))
+        #if($msgId != 0)
+            #if($msgId > $maxId)
+                #set($maxId = $msgId)
+            #end
     public final static short ${msg.name} = ${msgId};
-#end
-#end
-#if($maxId != 0)
+        #end
+    #end
+    #if($maxId != 0)
     public final static short ${msgGroup.getJavaOuterClassname()}MaxId = ${msgId};
-#end
-    // -----------------${msgGroup.name}--------------
+    #end
+// -----------------${msgGroup.name}--------------
 #end
 }

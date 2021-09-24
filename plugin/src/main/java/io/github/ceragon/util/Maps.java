@@ -5563,10 +5563,8 @@ public class Maps {
 
     public static <K, V> Map<V, K> inverse(Map<K, V> map, boolean force) {
         Map<V, K> resultMap = new LinkedHashMap<>();
-        Iterator var3 = map.entrySet().iterator();
 
-        while(var3.hasNext()) {
-            Entry<K, V> entry = (Entry)var3.next();
+        for (Entry<K, V> entry : map.entrySet()) {
             V value = entry.getValue();
             if (!force && resultMap.containsKey(value)) {
                 throw new IllegalArgumentException("duplicated key found: " + value);

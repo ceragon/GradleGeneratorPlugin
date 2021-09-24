@@ -1,0 +1,148 @@
+plugins {
+    /** 可选，用于增加 clean 的 task */
+    id 'base'
+    id 'io.github.ceragon.proto' version '1.1'
+}
+
+proto {
+    /** 用于生成前先删除一些旧文件 */
+//    deleteFile(fileTree(dir: 'build', include: '**/*.java'))
+    /** 指定protoc的版本号，参考 https://github.com/protocolbuffers/protobuf/tags */
+    protocVersion = "3.11.4"
+    /** 用于自定义protoc程序的路径，不指定则自动从网络下载 */
+//    protocCommand = "~/protoc.exe"
+    /** 用于指定proto文件的目录，可以指定多个，(默认从 protofiles 目录读取) */
+//    protoFilePaths = ["protofiles","protofiles2"]
+
+    outputTargets {
+        javaCode {
+            type = "java"
+            /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+            /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/javaCode"
+        }
+
+//        cppCode {
+//            type = "cpp"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/cppCode"
+//        }
+//        pythonCode {
+//            type = "python"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/pythonCode"
+//        }
+//        csharpCode {
+//            type = "csharp"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/csharpCode"
+        /** 可选编译参数 https://developers.google.com/protocol-buffers/docs/reference/csharp-generated#compiler_options */
+//            outputOptions = ""
+//        }
+//        dartCode {
+//            type = "dart"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/dartCode"
+//        }
+//        goCode {
+//            type = "go"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/goCode"
+        /** 可选编译参数 https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation */
+//            outputOptions = ""
+//        }
+//        kotlinCode {
+//            type = "kotlin"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/kotlinCode"
+//        }
+//        rubyCode {
+//            type = "ruby"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/rubyCode"
+//        }
+//        objectiveCCode {
+//            type = "objc"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/objectiveCCode"
+//        }
+//        phpCode {
+//            type = "php"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/phpCode"
+//        }
+//        jsCode {
+//            type = "js"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/jsCode"
+        /** 编译可选项，参考: https://developers.google.com/protocol-buffers/docs/reference/javascript-generated#invocation */
+//            outputOptions = "library=myprotos_lib.js,binary"
+//        }
+    }
+
+    /** 获取全部的协议，用于生成一个文件 */
+    totalMsgBuilds {
+        /** 名称可以随意起，但不能重复 */
+        commandCode {
+            /** template 目录下的模板名称 */
+            vmFile = "HOpCommand.vm"
+            /** 生成的文件位置，baseDir 表示当前目录 */
+            targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
+            /** 是否覆盖已存在的文件 */
+//            overwrite = true
+        }
+    }
+    /** 遍历每个 proto 文件中的每个 message，生成每个 message 对应的文件 */
+    everyMsgBuilds {
+        build1 {
+            vmFile = "LoginMsgCommand.vm"
+            targetFile = baseDir('build/java/com/ceragon/monkeygame/hall/command/login/${MsgName}Command.java')
+            /** 不覆盖已存在的文件 */
+            overwrite = false
+            /** message 名字匹配规则，支持正则表达式 */
+            msgNameMatch = [".*Request"]
+            /** proto 文件名称匹配规则，支持正则表达式 */
+            protoNameMatch = [".*ProtoLogin.proto"]
+        }
+        build2 {
+            vmFile = "IMsgCommand.vm"
+            targetFile = baseDir('build/java/com/ceragon/monkeygame/command/I${MsgName}Command.java')
+            /** 是否覆盖已存在的文件 */
+//            overwrite = true
+            msgNameMatch = [".*Request"]
+            protoNameMatch = [".*"]
+        }
+    }
+    // 遍历每个proto文件，用于生成文件
+    everyProtoBuilds {
+        build1 {
+            vmFile = "LoginCommandManager.vm"
+            targetFile = baseDir('build/java/com/ceragon/monkeygame/hall/command/login/LoginCommandManager.java')
+            /** 是否覆盖已存在的文件 */
+//            overwrite = true
+            /** proto 文件名称匹配规则，支持正则表达式 */
+            protoNameMatch = [".*ProtoLogin.proto"]
+        }
+    }
+}

@@ -7,6 +7,7 @@ import io.github.ceragon.util.BuildContext;
 import io.github.ceragon.util.FileFilter;
 import io.github.ceragon.util.PluginTaskException;
 import com.github.os72.protocjar.Protoc;
+import io.github.ceragon.util.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -22,23 +23,23 @@ import java.util.List;
 
 public class OutputTargetUtil {
     public static void initTarget(final OutputTarget target) {
-        target.setAddSources(target.getAddSources().toLowerCase().trim());
-        if ("true".equals(target.getAddSources())) target.setAddSources("main");
+//        target.setAddSources(target.getAddSources().toLowerCase().trim());
+//        if ("true".equals(target.getAddSources())) target.setAddSources("main");
 
         if (target.getOutputDirectory() == null) {
-            String subdir = "generated-" + ("test".equals(target.getAddSources()) ? "test-" : "") + "sources";
+            String subdir = "generated-sources";
             String taskName = target.getName();
             String path = PluginContext.project().getBuildDir().getPath() + File.separator + subdir + File.separator;
-            if (taskName != null){
+            if (taskName != null) {
                 path += taskName;
             }
             target.setOutputDirectory(path);
         }
 
-        if (target.getOutputDirectorySuffix() != null) {
-            target.setOutputDirectory(new File(target.getOutputDirectory(),
-                    target.getOutputDirectorySuffix()).getPath());
-        }
+//        if (target.getOutputDirectorySuffix() != null) {
+//            target.setOutputDirectory(new File(target.getOutputDirectory(),
+//                    target.getOutputDirectorySuffix()).getPath());
+//        }
     }
 
     public static void preprocessTarget(OutputTarget target) throws PluginTaskException {
@@ -167,11 +168,7 @@ public class OutputTargetUtil {
                 for (String arg : outputOptions.split("\\s+")) cmd.add(arg);
             }
         } else {
-            if (outputOptions != null) {
-                cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
-            } else {
-                cmd.add("--" + type + "_out=" + outputDir);
-            }
+            buildOutputOptions(type, outputOptions, outputDir, cmd);
 
             if (pluginPath != null) {
                 PluginContext.log().quiet("    Plugin path: " + pluginPath);
@@ -181,6 +178,25 @@ public class OutputTargetUtil {
         cmd.add(file.toString());
         if (version != null) cmd.add("-v" + version);
         return cmd;
+    }
+
+    private static void buildOutputOptions(String type, String outputOptions, String outputDir, Collection<String> cmd) {
+        if (StringUtils.isBlank(outputOptions)) {
+            cmd.add("--" + type + "_out=" + outputDir);
+        } else {
+            if ("js".equals(type)) {
+                cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
+            } else {
+                cmd.add("--" + type + "_out=" + outputDir);
+            }
+            switch (type) {
+                case "go":
+                case "csharp":
+                    cmd.add("--" + type + "_opt=" + outputOptions);
+                    break;
+            }
+        }
+
     }
 
     private static void populateIncludes(List<File> includeDirectories, Collection<String> args) throws PluginTaskException {

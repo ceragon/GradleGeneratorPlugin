@@ -14,10 +14,16 @@ apply plugin: 'io.github.ceragon.proto'
 
 
 proto {
-//    protocVersion = "3.18.0"
+    protocVersion = "3.11.4"
+//    protocCommand = getProtocPath()
+    deleteFile(fileTree(dir: 'build/generated-sources', include: '**/*.java'))
+
     outputTargets {
         javaCode {
             type = "java"
+        }
+        cppCode {
+            type = "cpp"
         }
     }
     // 获取全部的协议，用于生成文件

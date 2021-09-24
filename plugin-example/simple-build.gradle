@@ -1,0 +1,97 @@
+plugins {
+    /** 可选，用于增加 clean 的 task */
+    id 'base'
+    id 'io.github.ceragon.proto' version '1.1'
+}
+
+proto {
+    /** 指定protoc的版本号，参考 https://github.com/protocolbuffers/protobuf/tags */
+    protocVersion = "3.11.4"
+    /** 生成官方 protobuf 代码配置，解注释即可开始使用 */
+    outputTargets {
+        javaCode {
+            type = "java"
+            /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+            /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/javaCode"
+        }
+
+//        cppCode {
+//            type = "cpp"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/cppCode"
+//        }
+//        pythonCode {
+//            type = "python"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/pythonCode"
+//        }
+//        csharpCode {
+//            type = "csharp"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/csharpCode"
+        /** 可选编译参数 https://developers.google.com/protocol-buffers/docs/reference/csharp-generated#compiler_options */
+//            outputOptions = ""
+//        }
+//        dartCode {
+//            type = "dart"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/dartCode"
+//        }
+//        goCode {
+//            type = "go"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/goCode"
+        /** 可选编译参数 https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation */
+//            outputOptions = ""
+//        }
+//        kotlinCode {
+//            type = "kotlin"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/kotlinCode"
+//        }
+//        rubyCode {
+//            type = "ruby"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/rubyCode"
+//        }
+//        objectiveCCode {
+//            type = "objc"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/objectiveCCode"
+//        }
+//        phpCode {
+//            type = "php"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/phpCode"
+//        }
+//        jsCode {
+//            type = "js"
+        /** 清理输出目录 (默认清理) */
+//            cleanOutputFolder = true
+        /** 输出目录 (默认路径如下) */
+//            outputDirectory = "build/generated-sources/jsCode"
+        /** 编译可选项，参考: https://developers.google.com/protocol-buffers/docs/reference/javascript-generated#invocation */
+//            outputOptions = "library=myprotos_lib.js,binary"
+//        }
+    }
+}
