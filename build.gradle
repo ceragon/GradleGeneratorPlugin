@@ -64,7 +64,7 @@ subprojects {
 task copySimpleExample(type: Copy) {
     from('plugin-example') {
         include 'gradle/**'
-        include 'protofiles/**'
+        include 'protofiles/Foo.proto'
         include 'simple-build.gradle'
         include 'gradlew'
         include 'gradlew.bat'
@@ -93,6 +93,7 @@ task copyFullExample(type: Copy) {
         include 'proto-build.bat'
         include 'proto-build.sh'
         include 'settings.gradle'
+        exclude 'protofiles/Foo.proto'
     }
     into('build/example/proto-full')
     rename('full-build.gradle', 'build.gradle')
