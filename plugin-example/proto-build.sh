@@ -1,1 +1,1 @@
-./gradlew proto
+./gradlew proto -b build.gradle

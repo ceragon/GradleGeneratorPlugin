@@ -18,13 +18,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
 @Value
 public class MsgCodeBuild {
     List<ProtoFileDesc> protoFileDescList;
+
+    private boolean nameFilter(List<String> matches, String targetName) {
+        if (matches == null || matches.isEmpty()) {
+            return true;
+        }
+        return matches.stream().anyMatch(targetName::matches);
+    }
 
     //region -------- 使用全部消息的集合生成代码 ------------
     public boolean buildTotalMsgCode(String resourceRoot, Set<TotalMsgBuildConfig> configList) {
@@ -59,16 +65,14 @@ public class MsgCodeBuild {
 
     private boolean processEveryMsgCodeConfig(String resourceRoot, EveryMsgBuildConfig config) {
         return this.protoFileDescList.stream()
-                .filter((((Predicate<ProtoFileDesc>) pojo -> config.getProtoNameMatch().isEmpty())
-                        .or(pojo -> config.getProtoNameMatch().stream().anyMatch(protoNameMatch -> pojo.getName().matches(protoNameMatch)))))
-                .allMatch(pojo -> processEveryMsgCodePojoAndConfig(resourceRoot, pojo, config));
+                .filter(desc -> nameFilter(config.getProtoNameMatch(), desc.getName()))
+                .allMatch(desc -> processEveryMsgCodePojoAndConfig(resourceRoot, desc, config));
     }
 
     private boolean processEveryMsgCodePojoAndConfig(String resourceRoot, ProtoFileDesc pojo, EveryMsgBuildConfig config) {
         return pojo.getMessageList().stream()
-                .filter(((Predicate<ProtoMessageDesc>) protoMessageDesc -> config.getMsgNameMatch().isEmpty())
-                        .or(protoMessageDesc -> config.getMsgNameMatch().stream().anyMatch(msgNameMatch -> protoMessageDesc.getName().matches(msgNameMatch))))
-                .allMatch(protoMessagePojo -> processEveryMsgCode(resourceRoot, protoMessagePojo, config));
+                .filter(desc -> nameFilter(config.getMsgNameMatch(), desc.getName()))
+                .allMatch(desc -> processEveryMsgCode(resourceRoot, desc, config));
     }
 
     private boolean processEveryMsgCode(String resourceRoot, ProtoMessageDesc protoMessagePojo, EveryMsgBuildConfig config) {
@@ -88,14 +92,15 @@ public class MsgCodeBuild {
 
     //endregion
 
+    //region
     public boolean buildEveryProtoCode(String resourceRoot, Set<EveryProtoBuildConfig> everyProto) {
         return everyProto.stream().allMatch(config -> processEveryProtoCodeConfig(resourceRoot, config));
     }
 
     private boolean processEveryProtoCodeConfig(String resourceRoot, EveryProtoBuildConfig config) {
         return this.protoFileDescList.stream()
-                .filter(pojo -> config.getProtoNameMatch().stream().anyMatch(protoNameMatch -> pojo.getName().matches(protoNameMatch)))
-                .allMatch(pojo -> processEveryProtoCode(resourceRoot, pojo, config));
+                .filter(desc -> nameFilter(config.getProtoNameMatch(), desc.getName()))
+                .allMatch(desc -> processEveryProtoCode(resourceRoot, desc, config));
     }
 
     private boolean processEveryProtoCode(String resourceRoot, ProtoFileDesc protoFileDesc, EveryProtoBuildConfig config) {
@@ -113,6 +118,6 @@ public class MsgCodeBuild {
             return false;
         }
     }
-
+    //endregion
 
 }
