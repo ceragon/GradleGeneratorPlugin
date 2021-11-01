@@ -4,10 +4,8 @@ import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.UnknownFieldSet.Field;
-import io.github.ceragon.util.StringUtils;
 import lombok.Builder;
 import lombok.Singular;
-import lombok.Value;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +31,7 @@ public class ProtoMessageDesc {
 
     /**
      * 消息的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html
-     * @return
+     * @return 注释原始信息
      */
     public Location getLocation() {
         return location;
@@ -124,7 +122,7 @@ public class ProtoMessageDesc {
 
     /**
      * 获取proto文件中消息的注释 leadingComments，详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getLeadingComments--
-     * @return
+     * @return 首部注释信息
      */
     public String getLeadingComments() {
         return StringUtils.trimAndLine(location.getLeadingComments());
@@ -132,7 +130,7 @@ public class ProtoMessageDesc {
 
     /**
      * 获取proto文件中消息的注释 trailingComments, 详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getTrailingComments--
-     * @return
+     * @return 尾部的注释信息
      */
     public String getTrailingComments() {
         return StringUtils.trimAndLine(location.getTrailingComments());

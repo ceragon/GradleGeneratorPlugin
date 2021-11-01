@@ -2,7 +2,6 @@ package io.github.ceragon.protobuf.bean;
 
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import io.github.ceragon.util.StringUtils;
 import lombok.Builder;
 
 /**
@@ -62,14 +61,14 @@ public class ProtoMessageFieldDesc {
     }
     /**
      * 获取proto文件中消息字段的注释 leadingComments，详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getLeadingComments--
-     * @return
+     * @return 首部注释信息
      */
     public String getLeadingComments() {
         return StringUtils.trimAndLine(location.getLeadingComments());
     }
     /**
      * 获取proto文件中消息字段的注释 trailingComments, 详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getTrailingComments--
-     * @return
+     * @return 尾部注释信息
      */
     public String getTrailingComments() {
         return StringUtils.trimAndLine(location.getTrailingComments());
