@@ -13,6 +13,7 @@ public interface I${msg.name}Command {
     default void execute(Channel channel, CSPacket packet) throws IOException {
         ${msg.name} request = ${msg.name}.parseFrom(packet.toInputStream());
     #foreach($field in $msg.fieldList)
+        // ${field.comments}
         ${field.javaTypeName} ${field.name} =request.get${util.upperFirstLetter($field.name)}();
     #end
     }

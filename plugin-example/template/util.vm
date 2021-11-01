@@ -1,0 +1,9 @@
+#macro(getMessageStart $fileName)
+    #set($startIndex = -1)
+    #if($fileName.contains("_"))
+        #set($array = $fileName.split("_"))
+        #if($array.size() > 0)
+            #set($startIndex = $Integer.parseInt($array)[0]))
+        #end
+    #end
+#end

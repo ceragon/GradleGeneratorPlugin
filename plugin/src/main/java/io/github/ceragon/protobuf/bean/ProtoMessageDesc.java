@@ -1,8 +1,10 @@
 package io.github.ceragon.protobuf.bean;
 
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.UnknownFieldSet.Field;
+import io.github.ceragon.util.StringUtils;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
@@ -16,16 +18,25 @@ import java.util.stream.Collectors;
 @Builder
 public class ProtoMessageDesc {
     private Descriptor orig;
+    private Location location;
     @Singular("field")
     private List<ProtoMessageFieldDesc> fieldList;
 
     /**
-     * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.descriptor?hl=en#Descriptor
+     * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.Descriptor.html
      *
      * @return 原始描述信息
      */
     public Descriptor getOrig() {
         return orig;
+    }
+
+    /**
+     * 消息的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html
+     * @return
+     */
+    public Location getLocation() {
+        return location;
     }
 
     /**
@@ -64,6 +75,7 @@ public class ProtoMessageDesc {
 
     /**
      * 获取 message 所在 proto 文件中定义的 java 包名
+     *
      * @return java 包名
      */
     public String getJavaPackage() {
@@ -72,6 +84,7 @@ public class ProtoMessageDesc {
 
     /**
      * 获取消息的名称
+     *
      * @return 消息名称
      */
     public String getName() {
@@ -81,6 +94,7 @@ public class ProtoMessageDesc {
     /**
      * 获取此 message 中依赖的包名。(该方法目前处于测试状态)
      * 如：字段是枚举类型，字段是另外一个 message 类型, 字段是 proto的 ByteString 类型
+     *
      * @return 依赖的所有包名
      */
     public List<String> getDependencyPackage() {
@@ -106,5 +120,38 @@ public class ProtoMessageDesc {
                             return "";
                     }
                 }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取proto文件中消息的注释 leadingComments，详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getLeadingComments--
+     * @return
+     */
+    public String getLeadingComments() {
+        return StringUtils.trimAndLine(location.getLeadingComments());
+    }
+
+    /**
+     * 获取proto文件中消息的注释 trailingComments, 详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getTrailingComments--
+     * @return
+     */
+    public String getTrailingComments() {
+        return StringUtils.trimAndLine(location.getTrailingComments());
+    }
+
+    /**
+     * 综合消息的所有注释，且会删掉首尾的换行符
+     * @return 消息的所有注释
+     */
+    public String getComments() {
+        if (location == null) {
+            return "";
+        }
+        if (StringUtils.isEmpty(location.getLeadingComments())) {
+            return getTrailingComments();
+        }
+        if (StringUtils.isEmpty(location.getTrailingComments())) {
+            return getLeadingComments();
+        }
+        return getLeadingComments() + "\r\n" + getTrailingComments();
     }
 }

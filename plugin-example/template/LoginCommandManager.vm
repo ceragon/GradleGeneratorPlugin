@@ -16,7 +16,8 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class LoginCommandManager implements InitializingBean {
-    private TIntObjectMap<ILoginCommand> commandMap;
+    private TIntObjectMap
+            <ILoginCommand> commandMap;
     private final ApplicationContext context;
 
     @Autowired

@@ -1,8 +1,11 @@
 package io.github.ceragon.protobuf.protoc;
 
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
 import io.github.ceragon.protobuf.bean.ProtoFileDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder;
+import io.github.ceragon.protobuf.constant.ProtoConstant;
 import io.github.ceragon.util.FileFilter;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
@@ -36,8 +39,9 @@ public class DescriptorLoader {
         try (FileInputStream fin = new FileInputStream(descFile)) {
             FileDescriptorSet descriptorSet = FileDescriptorSet.parseFrom(fin);
             for (FileDescriptorProto fdp : descriptorSet.getFileList()) {
+                SourceCodeInfo sourceCodeInfo = fdp.getSourceCodeInfo();
                 ProtoFileDesc.ProtoFileDescBuilder fileDescPojoBuilder = ProtoFileDesc.builder()
-                        .orig(fdp);
+                        .orig(fdp).sourceCodeInfo(sourceCodeInfo);
                 if (fdp.getMessageTypeCount() < 1) {
                     protoFileDescList.add(fileDescPojoBuilder.build());
                     continue;
@@ -46,8 +50,12 @@ public class DescriptorLoader {
                 for (Descriptor descriptor : fd.getMessageTypes()) {
                     ProtoMessageDesc.ProtoMessageDescBuilder messageBuilder = ProtoMessageDesc.builder()
                             .orig(descriptor);
+                    setMessageComment(descriptor.getIndex(), messageBuilder, sourceCodeInfo);
                     for (FieldDescriptor fieldDescriptor : descriptor.getFields()) {
-                        messageBuilder.field(ProtoMessageFieldDesc.builder().orig(fieldDescriptor).build());
+                        ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder fieldBuilder = ProtoMessageFieldDesc.builder()
+                                .orig(fieldDescriptor);
+                        setFieldComment(descriptor.getIndex(), fieldDescriptor.getIndex(), fieldBuilder, sourceCodeInfo);
+                        messageBuilder.field(fieldBuilder.build());
                     }
                     fileDescPojoBuilder.message(messageBuilder.build());
                 }
@@ -57,5 +65,19 @@ public class DescriptorLoader {
         } catch (IOException | DescriptorValidationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void setMessageComment(int index, ProtoMessageDesc.ProtoMessageDescBuilder builder, SourceCodeInfo sourceCodeInfo) {
+        List<Integer> pathList = ProtoConstant.modifyMessagePath(index, 0);
+        sourceCodeInfo.getLocationList().stream()
+                .filter(location -> location.getPathList().equals(pathList))
+                .forEach(builder::location);
+    }
+
+    private static void setFieldComment(int messageIndex, int index, ProtoMessageFieldDescBuilder builder, SourceCodeInfo sourceCodeInfo) {
+        List<Integer> pathList = ProtoConstant.modifyMessagePath(messageIndex, index);
+        sourceCodeInfo.getLocationList().stream()
+                .filter(location -> location.getPathList().equals(pathList))
+                .forEach(builder::location);
     }
 }

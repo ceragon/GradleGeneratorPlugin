@@ -35,7 +35,7 @@ pluginBundle {
             displayName = 'Gradle proto generate plugin'
             description = "generate code from protobuf file"
             tags = ['protobuf']
-            version = '1.1'
+            version = '1.2'
         }
     }
 }

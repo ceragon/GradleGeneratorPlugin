@@ -1,7 +1,7 @@
 plugins {
     /** 可选，用于增加 clean 的 task */
     id 'base'
-    id 'io.github.ceragon.proto' version '1.1'
+    id 'io.github.ceragon.proto' version '1.2'
 }
 
 proto {

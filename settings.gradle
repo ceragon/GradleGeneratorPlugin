@@ -9,5 +9,5 @@
 
 rootProject.name = 'GradlePlugin'
 include('plugin')
-includeBuild('plugin-example')
+//includeBuild('plugin-example')
 

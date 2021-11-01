@@ -10,6 +10,7 @@ public class HOpCommand {
             #if($msgId > $maxId)
                 #set($maxId = $msgId)
             #end
+    // ${msg.comments}
     public final static short ${msg.name} = ${msgId};
         #end
     #end

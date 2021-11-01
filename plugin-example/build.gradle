@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'io.github.ceragon:plugin:1.1'
+        classpath 'io.github.ceragon:plugin:1.2'
     }
 }
 
@@ -48,7 +48,7 @@ proto {
         build2 {
             vmFile = "IMsgCommand.vm"
             targetFile = baseDir('build/java/com/ceragon/monkeygame/command/I${MsgName}Command.java')
-            overwrite = false
+            overwrite = true
             msgNameMatch = [".*Request"]
             protoNameMatch = [".*"]
         }

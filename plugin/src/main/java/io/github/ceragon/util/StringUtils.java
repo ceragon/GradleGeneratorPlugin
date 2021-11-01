@@ -27,4 +27,18 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static String formatKV(String message, Map<String, Object> params) {
         return StrSubstitutor.replace(message, params);
     }
+
+    public static String trimAndLine(String value) {
+        if (isEmpty(value)) {
+            return "";
+        }
+        value = value.trim();
+        if (value.endsWith("\r")) {
+            return trimAndLine(value.substring(0, value.length() - 1));
+        }
+        if (value.endsWith("\n")) {
+            return trimAndLine(value.substring(0, value.length() - 1));
+        }
+        return value;
+    }
 }
