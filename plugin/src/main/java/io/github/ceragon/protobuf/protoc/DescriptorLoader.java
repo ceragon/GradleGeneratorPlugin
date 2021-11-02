@@ -1,6 +1,7 @@
 package io.github.ceragon.protobuf.protoc;
 
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
 import io.github.ceragon.protobuf.bean.ProtoFileDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
@@ -68,14 +69,14 @@ public class DescriptorLoader {
     }
 
     private static void setMessageComment(int index, ProtoMessageDesc.ProtoMessageDescBuilder builder, SourceCodeInfo sourceCodeInfo) {
-        List<Integer> pathList = ProtoConstant.modifyMessagePath(index, 0);
+        List<Integer> pathList = ProtoConstant.modifyMessagePath(index);
         sourceCodeInfo.getLocationList().stream()
                 .filter(location -> location.getPathList().equals(pathList))
                 .forEach(builder::location);
     }
 
     private static void setFieldComment(int messageIndex, int index, ProtoMessageFieldDescBuilder builder, SourceCodeInfo sourceCodeInfo) {
-        List<Integer> pathList = ProtoConstant.modifyMessagePath(messageIndex, index);
+        List<Integer> pathList = ProtoConstant.modifyMessageFieldPath(messageIndex, index);
         sourceCodeInfo.getLocationList().stream()
                 .filter(location -> location.getPathList().equals(pathList))
                 .forEach(builder::location);

@@ -13,7 +13,7 @@ gradle generator plugin 是一个使用java语言编写的gradle插件。 你可
 
 1. 点击下载基础文件目录 [proto-simple.zip](https://github.com/ceragon/GradleGeneratorPlugin/releases/download/v1.1/proto-simple.zip)
 2. 解压到某个目录
-3. 在文件的 protofiles 目录中添加自定义的 proto 文件
+3. 在目录的 protofiles 目录中添加自定义的 proto 文件
 4. 执行 proto-build.bat 或者 proto-build.sh
 5. 最后在build 目录的 generated-sources 目录中可以看到生成的 protobuf 的 java 文件
 
@@ -25,7 +25,7 @@ gradle generator plugin 是一个使用java语言编写的gradle插件。 你可
 
 1. 下载基础文件目录 [proto-full.zip](https://github.com/ceragon/GradleGeneratorPlugin/releases/download/v1.1/proto-full.zip)
 2. 解压到某个目录
-3. 在文件的 protofiles 目录中添加自定义的 proto 文件
+3. 在目录的 protofiles 目录中添加自定义的 proto 文件
 4. 执行 proto-build.bat 或者 proto-build.sh
 5. 最后在build 目录的 generated-sources 目录中可以看到生成的 protobuf 的 java 文件
 
@@ -33,11 +33,11 @@ gradle generator plugin 是一个使用java语言编写的gradle插件。 你可
 
 1. 在build.gradle 中添加插件配置
 
-> 详细方式可查看此工程的 [gradle官方插件仓库](https://plugins.gradle.org/plugin/io.github.ceragon.proto)
+> 更多配置方式可查看此工程的 [gradle官方插件仓库](https://plugins.gradle.org/plugin/io.github.ceragon.proto)
 
 ```groovy
 plugins {
-    id "io.github.ceragon.proto" version "1.1"
+    id "io.github.ceragon.proto" version "1.2"
 }
 ```
 

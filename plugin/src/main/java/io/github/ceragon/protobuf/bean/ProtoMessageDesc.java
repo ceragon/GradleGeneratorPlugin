@@ -144,12 +144,19 @@ public class ProtoMessageDesc {
         if (location == null) {
             return "";
         }
-        if (StringUtils.isEmpty(location.getLeadingComments())) {
+        String leadingComments = location.getLeadingComments();
+        String trailingComments = location.getTrailingComments();
+        if (StringUtils.isEmpty(leadingComments) && StringUtils.isEmpty(trailingComments )){
+            return "";
+        }
+        if (StringUtils.isEmpty(leadingComments)) {
             return getTrailingComments();
         }
-        if (StringUtils.isEmpty(location.getTrailingComments())) {
+        if (StringUtils.isEmpty(trailingComments)) {
             return getLeadingComments();
         }
-        return getLeadingComments() + "\r\n" + getTrailingComments();
+        return getLeadingComments().replaceAll("[\r\n]", " | ") +
+                " | " +
+                getTrailingComments().replaceAll("[\r\n]", " | ");
     }
 }
