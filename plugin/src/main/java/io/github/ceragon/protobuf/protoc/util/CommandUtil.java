@@ -4,9 +4,12 @@ import io.github.ceragon.PluginContext;
 import io.github.ceragon.util.PluginTaskException;
 import com.github.os72.protocjar.Protoc;
 import com.github.os72.protocjar.ProtocVersion;
+import org.apache.commons.lang.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 public class CommandUtil {
     public static String buildProtocExe(String protocCommand, final String protocVersion) throws PluginTaskException {
@@ -37,4 +40,21 @@ public class CommandUtil {
     }
 
 
+    public static String getVersion(String protocCommand) {
+        if (StringUtils.isEmpty(protocCommand)) {
+            return null;
+        }
+        try {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            Protoc.runProtoc(protocCommand, Collections.singletonList("--version"), outStream, System.err);
+            String outStr = outStream.toString();
+            if (StringUtils.isEmpty(outStr)) {
+                return null;
+            }
+            return outStr.split(" ")[1].trim();
+        } catch (Exception e) {
+            PluginContext.log().quiet(e.getMessage());
+            return null;
+        }
+    }
 }

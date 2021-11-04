@@ -33,9 +33,8 @@ public class ProtoGeneratorTask {
                     .includeImports(false)
                     .build();
             List<OutputTarget> outputTargets = new ArrayList<>(extension.getOutputTargets());
-            OutputTarget descriptorTarget = new OutputTarget("descriptor");
-            descriptorTarget.setType("descriptor");
-            descriptorTarget.setOutputOptions("--include_source_info");
+            OutputTarget descriptorTarget = DescriptorLoader.createDescriptorOutputTarget(extension.getProtocCommand(), extension.getProtocVersion());
+
             outputTargets.add(descriptorTarget);
             // 生成目标proto格式，以及描述信息
             protocBuild.process(outputTargets);

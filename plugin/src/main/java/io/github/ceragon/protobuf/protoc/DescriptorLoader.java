@@ -1,19 +1,21 @@
 package io.github.ceragon.protobuf.protoc;
 
-import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
-import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
-import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
-import io.github.ceragon.protobuf.bean.ProtoFileDesc;
-import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
-import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder;
-import io.github.ceragon.protobuf.constant.ProtoConstant;
-import io.github.ceragon.util.FileFilter;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
+import io.github.ceragon.protobuf.bean.ProtoFileDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
+import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder;
+import io.github.ceragon.protobuf.constant.ProtoConstant;
+import io.github.ceragon.protobuf.extension.OutputTarget;
+import io.github.ceragon.protobuf.protoc.util.CommandUtil;
+import io.github.ceragon.util.FileFilter;
+import io.github.ceragon.util.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
@@ -80,5 +82,23 @@ public class DescriptorLoader {
         sourceCodeInfo.getLocationList().stream()
                 .filter(location -> location.getPathList().equals(pathList))
                 .forEach(builder::location);
+    }
+
+
+    public static OutputTarget createDescriptorOutputTarget(String protocCommand, String protocVersion) {
+        OutputTarget descriptorTarget = new OutputTarget("descriptor");
+        descriptorTarget.setType("descriptor");
+        String options = "--include_source_info --include_imports";
+        if (!StringUtils.isEmpty(protocCommand)) {
+            String theVersion = CommandUtil.getVersion(protocCommand);
+            if (theVersion == null || theVersion.equals("2.4.1")) {
+                options = "--include_imports";
+            }
+        }
+        if ("2.4.1".equals(protocVersion)) {
+            options = "--include_imports";
+        }
+        descriptorTarget.setOutputOptions(options);
+        return descriptorTarget;
     }
 }
