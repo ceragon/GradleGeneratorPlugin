@@ -5,16 +5,19 @@ import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
+import com.google.protobuf.Descriptors.EnumDescriptor;
+import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import io.github.ceragon.PluginContext;
+import io.github.ceragon.protobuf.bean.ProtoEnumDesc;
+import io.github.ceragon.protobuf.bean.ProtoEnumValueDesc;
 import io.github.ceragon.protobuf.bean.ProtoFileDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder;
 import io.github.ceragon.protobuf.constant.ProtoConstant;
 import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
-import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.protoc.util.CommandUtil;
 import io.github.ceragon.util.FileFilter;
 import io.github.ceragon.util.StringUtils;
@@ -51,7 +54,8 @@ public class DescriptorLoader {
                     protoFileDescList.add(fileDescPojoBuilder.build());
                     continue;
                 }
-                FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{});
+                FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{}, true);
+                fileDescPojoBuilder.fdOrig(fd);
                 for (Descriptor descriptor : fd.getMessageTypes()) {
                     ProtoMessageDesc.ProtoMessageDescBuilder messageBuilder = ProtoMessageDesc.builder()
                             .orig(descriptor);
@@ -63,6 +67,16 @@ public class DescriptorLoader {
                         messageBuilder.field(fieldBuilder.build());
                     }
                     fileDescPojoBuilder.message(messageBuilder.build());
+                }
+                for (EnumDescriptor enumDescriptor : fd.getEnumTypes()) {
+                    ProtoEnumDesc.ProtoEnumDescBuilder enumBuilder = ProtoEnumDesc.builder()
+                            .orig(enumDescriptor);
+                    // 增加枚举的注释
+                    for (EnumValueDescriptor enumValueDescriptor : enumDescriptor.getValues()) {
+                        ProtoEnumValueDesc.ProtoEnumValueDescBuilder enumDesc = ProtoEnumValueDesc.builder()
+                                .orig(enumValueDescriptor);
+                        enumBuilder.value(enumDesc.build());
+                    }
                 }
                 protoFileDescList.add(fileDescPojoBuilder.build());
             }

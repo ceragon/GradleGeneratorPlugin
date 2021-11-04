@@ -2,7 +2,7 @@ package io.github.ceragon.protobuf.bean;
 
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
-import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
+import com.google.protobuf.Descriptors.FileDescriptor;
 import lombok.Builder;
 import lombok.Singular;
 
@@ -14,9 +14,11 @@ import java.util.List;
 @Builder
 public class ProtoFileDesc {
     private FileDescriptorProto orig;
+    private FileDescriptor fdOrig;
     private SourceCodeInfo sourceCodeInfo;
     @Singular(value = "message")
     private List<ProtoMessageDesc> messageList;
+    private List<ProtoEnumDesc> enumList;
 
     /**
      * 获取 proto 文件原始描述信息，全部接口详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.FileDescriptorProto.html
@@ -27,8 +29,13 @@ public class ProtoFileDesc {
         return orig;
     }
 
+    public FileDescriptor getFdOrig() {
+        return fdOrig;
+    }
+
     /**
      * 获取 proto 文件的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.html
+     *
      * @return 注释信息
      */
     public SourceCodeInfo getSourceCodeInfo() {

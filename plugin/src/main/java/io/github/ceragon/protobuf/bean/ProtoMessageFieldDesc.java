@@ -8,7 +8,7 @@ import lombok.Builder;
  * 单个 message 中单个字段的描述信息
  */
 @Builder
-public class ProtoMessageFieldDesc {
+public class ProtoMessageFieldDesc implements IProtoDesc {
     private FieldDescriptor orig;
     private Location location;
 
@@ -59,42 +59,9 @@ public class ProtoMessageFieldDesc {
                 return "";
         }
     }
-    /**
-     * 获取proto文件中消息字段的注释 leadingComments，详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getLeadingComments--
-     * @return 首部注释信息
-     */
-    public String getLeadingComments() {
-        return StringUtils.trimAndLine(location.getLeadingComments());
-    }
-    /**
-     * 获取proto文件中消息字段的注释 trailingComments, 详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html#getTrailingComments--
-     * @return 尾部注释信息
-     */
-    public String getTrailingComments() {
-        return StringUtils.trimAndLine(location.getTrailingComments());
-    }
 
-    /**
-     * 综合消息字段的所有注释，且会删掉首尾的换行符
-     * @return 消息的所有注释
-     */
-    public String getComments() {
-        if (location == null) {
-            return "";
-        }
-        String leadingComments = location.getLeadingComments();
-        String trailingComments = location.getTrailingComments();
-        if (StringUtils.isEmpty(leadingComments) && StringUtils.isEmpty(trailingComments )){
-            return "";
-        }
-        if (StringUtils.isEmpty(leadingComments)) {
-            return getTrailingComments();
-        }
-        if (StringUtils.isEmpty(trailingComments)) {
-            return getLeadingComments();
-        }
-        return getLeadingComments().replaceAll("[\r\n]", " | ") +
-                " | " +
-                getTrailingComments().replaceAll("[\r\n]", " | ");
+    @Override
+    public Location getLocation() {
+        return location;
     }
 }

@@ -1,7 +1,7 @@
 package io.github.ceragon.protobuf.bean;
 
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
-import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.UnknownFieldSet.Field;
 import lombok.Builder;
@@ -14,18 +14,18 @@ import java.util.stream.Collectors;
  * proto的单个消息的描述信息
  */
 @Builder
-public class ProtoMessageDesc implements IProtoDesc{
-    private Descriptor orig;
+public class ProtoEnumDesc implements IProtoDesc{
+    private EnumDescriptor orig;
     private Location location;
-    @Singular("field")
-    private List<ProtoMessageFieldDesc> fieldList;
+    @Singular("value")
+    private List<ProtoEnumValueDesc> valueList;
 
     /**
      * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.Descriptor.html
      *
      * @return 原始描述信息
      */
-    public Descriptor getOrig() {
+    public EnumDescriptor getOrig() {
         return orig;
     }
 
@@ -37,13 +37,8 @@ public class ProtoMessageDesc implements IProtoDesc{
         return location;
     }
 
-    /**
-     * 获取消息的全部字段描述信息
-     *
-     * @return 全部的字段描述信息
-     */
-    public List<ProtoMessageFieldDesc> getFieldList() {
-        return fieldList;
+    public List<ProtoEnumValueDesc> getValueList() {
+        return valueList;
     }
 
     private Field getOptionField(int number) {
@@ -87,37 +82,6 @@ public class ProtoMessageDesc implements IProtoDesc{
      */
     public String getName() {
         return orig.getName();
-    }
-
-    /**
-     * 获取此 message 中依赖的包名。(该方法目前处于测试状态)
-     * 如：字段是枚举类型，字段是另外一个 message 类型, 字段是 proto的 ByteString 类型
-     *
-     * @return 依赖的所有包名
-     */
-    public List<String> getDependencyPackage() {
-        return fieldList.stream()
-                .filter(field -> {
-                    switch (field.getOrig().getJavaType()) {
-                        case BYTE_STRING:
-                        case ENUM:
-                        case MESSAGE:
-                            return true;
-                        default:
-                            return false;
-                    }
-                }).map(field -> {
-                    switch (field.getOrig().getJavaType()) {
-                        case ENUM:
-                            return field.getOrig().getEnumType().getFullName();
-                        case MESSAGE:
-                            return field.getOrig().getMessageType().getFullName();
-                        case BYTE_STRING:
-                            return "com.google.protobuf.ByteString";
-                        default:
-                            return "";
-                    }
-                }).collect(Collectors.toList());
     }
 
 }
