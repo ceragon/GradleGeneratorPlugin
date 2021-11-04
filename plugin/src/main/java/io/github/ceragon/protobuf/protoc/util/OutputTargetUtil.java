@@ -2,6 +2,7 @@ package io.github.ceragon.protobuf.protoc.util;
 
 import io.github.ceragon.PluginContext;
 import io.github.ceragon.protobuf.constant.ContextKey;
+import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
 import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.util.BuildContext;
 import io.github.ceragon.util.FileFilter;
@@ -56,6 +57,18 @@ public class OutputTargetUtil {
             } catch (IOException e) {
                 PluginContext.log().error(e.getMessage(), e);
             }
+        }
+    }
+
+    public static void preprocessDescriptor(OutputBigDescriptor descriptor) throws PluginTaskException {
+        if (StringUtils.isEmpty(descriptor.getOutputFile())) {
+            throw new PluginTaskException("the descriptor file path is empty,name={}" + descriptor.getName());
+        }
+        File f = new File(descriptor.getOutputFile());
+        File parentDir = f.getParentFile();
+        if (!parentDir.exists()) {
+            PluginContext.log().quiet(parentDir + " does not exist. Creating...");
+            parentDir.mkdirs();
         }
     }
 
@@ -207,5 +220,57 @@ public class OutputTargetUtil {
                 throw new PluginTaskException("Include path '" + include.getPath() + "' is not a directory");
             args.add("-I" + include.getPath());
         }
+    }
+
+    public static void processDescriptor(String protocCommand, List<File> inputFileList,
+                                         List<File> includeDirectories, OutputBigDescriptor descriptor) throws PluginTaskException {
+        PluginContext.log().quiet("    Processing (big descriptor): " + inputFileList.toString());
+
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            TeeOutputStream outTee = new TeeOutputStream(System.out, out);
+            TeeOutputStream errTee = new TeeOutputStream(System.err, err);
+
+            int ret = 0;
+            Collection<String> cmd = buildCommand(includeDirectories, inputFileList, descriptor.getOutputFile(),
+                    descriptor.getOutputOptions(), descriptor.isIncludeImports(), descriptor.isIncludeSourceInfo());
+            if (protocCommand == null) ret = Protoc.runProtoc(cmd.toArray(new String[0]), outTee, errTee);
+            else ret = Protoc.runProtoc(protocCommand, Arrays.asList(cmd.toArray(new String[0])), outTee, errTee);
+
+            if (ret != 0)
+                throw new PluginTaskException("protoc-jar failed for " + descriptor.getName() + ". Exit code " + ret);
+        } catch (InterruptedException e) {
+            throw new PluginTaskException("Interrupted", e);
+        } catch (IOException e) {
+            throw new PluginTaskException("Unable to execute protoc-jar for " + descriptor.getName(), e);
+        }
+    }
+
+    private static Collection<String> buildCommand(List<File> includeDirectories, List<File> includeFileList,
+                                                   String outputFile, String outputOptions,
+                                                   boolean includeImports, boolean includeSourceInfo) throws PluginTaskException {
+        BuildContext context = PluginContext.buildContext();
+        final String version = context.getValue(ContextKey.PROTOC_VERSION);
+        Collection<String> cmd = new ArrayList<>();
+        populateIncludes(includeDirectories, cmd);
+        includeFileList.stream()
+                .map(file -> file.getParentFile().getPath())
+                .distinct()
+                .forEach(path -> cmd.add("-I" + path));
+
+        cmd.add("--descriptor_set_out=" + outputFile);
+        if (includeImports) {
+            cmd.add("--include_imports");
+        }
+        if (includeSourceInfo) {
+            cmd.add("--include_source_info");
+        }
+        if (outputOptions != null) {
+            cmd.addAll(Arrays.asList(outputOptions.split("\\s+")));
+        }
+        includeFileList.forEach(file -> cmd.add(file.getPath()));
+        if (version != null) cmd.add("-v" + version);
+        return cmd;
     }
 }

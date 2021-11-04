@@ -8,6 +8,7 @@ import io.github.ceragon.protobuf.constant.ProtoConstant;
 import io.github.ceragon.protobuf.extension.EveryMsgBuildConfig;
 import io.github.ceragon.protobuf.extension.EveryProtoBuildConfig;
 import io.github.ceragon.protobuf.extension.TotalMsgBuildConfig;
+import io.github.ceragon.protobuf.protoc.util.FileUtil;
 import io.github.ceragon.util.CodeGenTool;
 import io.github.ceragon.util.PathFormat;
 import io.github.ceragon.util.TemplateUtil;
@@ -24,13 +25,6 @@ import java.util.stream.Collectors;
 @Value
 public class MsgCodeBuild {
     List<ProtoFileDesc> protoFileDescList;
-
-    private boolean nameFilter(List<String> matches, String targetName) {
-        if (matches == null || matches.isEmpty()) {
-            return true;
-        }
-        return matches.stream().anyMatch(targetName::matches);
-    }
 
     //region -------- 使用全部消息的集合生成代码 ------------
     public boolean buildTotalMsgCode(String resourceRoot, Set<TotalMsgBuildConfig> configList) {
@@ -65,13 +59,13 @@ public class MsgCodeBuild {
 
     private boolean processEveryMsgCodeConfig(String resourceRoot, EveryMsgBuildConfig config) {
         return this.protoFileDescList.stream()
-                .filter(desc -> nameFilter(config.getProtoNameMatch(), desc.getName()))
+                .filter(desc -> FileUtil.nameFilter(config.getProtoNameMatch(), desc.getName()))
                 .allMatch(desc -> processEveryMsgCodePojoAndConfig(resourceRoot, desc, config));
     }
 
     private boolean processEveryMsgCodePojoAndConfig(String resourceRoot, ProtoFileDesc pojo, EveryMsgBuildConfig config) {
         return pojo.getMessageList().stream()
-                .filter(desc -> nameFilter(config.getMsgNameMatch(), desc.getName()))
+                .filter(desc -> FileUtil.nameFilter(config.getMsgNameMatch(), desc.getName()))
                 .allMatch(desc -> processEveryMsgCode(resourceRoot, desc, config));
     }
 
@@ -99,7 +93,7 @@ public class MsgCodeBuild {
 
     private boolean processEveryProtoCodeConfig(String resourceRoot, EveryProtoBuildConfig config) {
         return this.protoFileDescList.stream()
-                .filter(desc -> nameFilter(config.getProtoNameMatch(), desc.getName()))
+                .filter(desc -> FileUtil.nameFilter(config.getProtoNameMatch(), desc.getName()))
                 .allMatch(desc -> processEveryProtoCode(resourceRoot, desc, config));
     }
 

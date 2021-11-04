@@ -7,11 +7,13 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
+import io.github.ceragon.PluginContext;
 import io.github.ceragon.protobuf.bean.ProtoFileDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc;
 import io.github.ceragon.protobuf.bean.ProtoMessageFieldDesc.ProtoMessageFieldDescBuilder;
 import io.github.ceragon.protobuf.constant.ProtoConstant;
+import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
 import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.protoc.util.CommandUtil;
 import io.github.ceragon.util.FileFilter;
@@ -85,20 +87,20 @@ public class DescriptorLoader {
     }
 
 
-    public static OutputTarget createDescriptorOutputTarget(String protocCommand, String protocVersion) {
-        OutputTarget descriptorTarget = new OutputTarget("descriptor");
-        descriptorTarget.setType("descriptor");
-        String options = "--include_source_info --include_imports";
+    public static OutputBigDescriptor createOutputDescriptor(String protocCommand, String protocVersion) {
+        OutputBigDescriptor descriptor = new OutputBigDescriptor("temp-descriptor");
+        descriptor.setIncludeImports(true);
+        descriptor.setIncludeSourceInfo(true);
         if (!StringUtils.isEmpty(protocCommand)) {
             String theVersion = CommandUtil.getVersion(protocCommand);
             if (theVersion == null || theVersion.equals("2.4.1")) {
-                options = "--include_imports";
+                descriptor.setIncludeSourceInfo(false);
             }
         }
         if ("2.4.1".equals(protocVersion)) {
-            options = "--include_imports";
+            descriptor.setIncludeSourceInfo(false);
         }
-        descriptorTarget.setOutputOptions(options);
-        return descriptorTarget;
+        descriptor.setOutputFile(PluginContext.pathFormat().format("${project.build.dir}/temp-descriptor/temp.desc"));
+        return descriptor;
     }
 }

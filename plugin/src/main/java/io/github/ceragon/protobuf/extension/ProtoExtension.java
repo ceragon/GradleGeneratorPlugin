@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public class ProtoExtension {
 
     @Internal("输出配置")
     private final NamedDomainObjectContainer<OutputTarget> outputTargets;
+    @Internal("匹配多个proto文件，生成一个大的描述信息")
+    private final NamedDomainObjectContainer<OutputBigDescriptor> outputBigDescriptors;
     @Internal("模板文件的目录")
     private String templatePath;
     @Internal("使用全部消息来生成代码")
@@ -44,6 +47,7 @@ public class ProtoExtension {
                 PluginContext.pathFormat().format("${project.base.dir}${s}protofiles")
         );
         outputTargets = project.container(OutputTarget.class);
+        outputBigDescriptors = project.container(OutputBigDescriptor.class);
         totalMsgBuilds = project.container(TotalMsgBuildConfig.class);
         everyMsgBuilds = project.container(EveryMsgBuildConfig.class);
         everyProtoBuilds = project.container(EveryProtoBuildConfig.class);
@@ -69,6 +73,14 @@ public class ProtoExtension {
 
     public void outputTargets(Action<NamedDomainObjectContainer<OutputTarget>> block) {
         block.execute(this.outputTargets);
+    }
+
+    public void outputBigDescriptors(Closure<?> block) {
+        ConfigureUtil.configure(block, this.outputBigDescriptors);
+    }
+
+    public void outputBigDescriptors(Action<NamedDomainObjectContainer<OutputBigDescriptor>> block) {
+        block.execute(this.outputBigDescriptors);
     }
 
     public void totalMsgBuilds(Closure<?> block) {

@@ -3,20 +3,27 @@ package io.github.ceragon.protobuf.protoc;
 
 import io.github.ceragon.PluginContext;
 import io.github.ceragon.protobuf.constant.ContextKey;
+import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
 import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.protoc.util.CommandUtil;
+import io.github.ceragon.protobuf.protoc.util.FileUtil;
 import io.github.ceragon.protobuf.protoc.util.IncludeUtil;
 import io.github.ceragon.protobuf.protoc.util.OutputTargetUtil;
 import io.github.ceragon.util.BuildContext;
+import io.github.ceragon.util.FileFilter;
 import io.github.ceragon.util.PluginTaskException;
 import io.github.ceragon.util.StringUtils;
 import com.github.os72.protocjar.ProtocVersion;
 import lombok.Builder;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 public class ProtocBuild {
@@ -30,7 +37,7 @@ public class ProtocBuild {
     boolean includeStdTypes;
     boolean includeImports;
 
-    public void process(List<OutputTarget> outputTargets) throws PluginTaskException {
+    public void process(Collection<OutputTarget> outputTargets, List<OutputBigDescriptor> outputBigDescriptors) throws PluginTaskException {
         BuildContext context = PluginContext.buildContext();
         final Project project = PluginContext.project();
         // 默认值
@@ -63,5 +70,21 @@ public class ProtocBuild {
         for (OutputTarget target : outputTargets) {
             OutputTargetUtil.processTarget(protocCommand, inputDirectories, includeDirectoryList, target);
         }
+
+        for (OutputBigDescriptor descriptor : outputBigDescriptors) {
+            OutputTargetUtil.preprocessDescriptor(descriptor);
+        }
+
+        FileFilter fileFilter = new FileFilter(extension);
+        for (OutputBigDescriptor descriptor : outputBigDescriptors) {
+            List<File> inputFileList = inputDirectories.stream()
+                    .map(File::new)
+                    .flatMap(dirFile -> FileUtils.listFiles(dirFile, fileFilter, TrueFileFilter.INSTANCE).stream())
+                    .filter(file -> FileUtil.nameFilter(descriptor.getProtoNameMatch(), file.getName()))
+                    .collect(Collectors.toList());
+            OutputTargetUtil.processDescriptor(protocCommand, inputFileList, includeDirectoryList, descriptor);
+        }
     }
+
+
 }

@@ -1,6 +1,7 @@
 package io.github.ceragon.protobuf;
 
 import io.github.ceragon.protobuf.bean.ProtoFileDesc;
+import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
 import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.extension.ProtoExtension;
 import io.github.ceragon.protobuf.protoc.DescriptorLoader;
@@ -32,14 +33,16 @@ public class ProtoGeneratorTask {
                     .includeStdTypes(true)
                     .includeImports(false)
                     .build();
-            List<OutputTarget> outputTargets = new ArrayList<>(extension.getOutputTargets());
-            OutputTarget descriptorTarget = DescriptorLoader.createDescriptorOutputTarget(extension.getProtocCommand(), extension.getProtocVersion());
 
-            outputTargets.add(descriptorTarget);
             // 生成目标proto格式，以及描述信息
-            protocBuild.process(outputTargets);
+            List<OutputBigDescriptor> outputBigDescriptors = new ArrayList<>(extension.getOutputBigDescriptors());
+            OutputBigDescriptor descriptor = DescriptorLoader.createOutputDescriptor(extension.getProtocCommand(), extension.getProtocVersion());
+            outputBigDescriptors.add(descriptor);
+
+            protocBuild.process(extension.getOutputTargets(), outputBigDescriptors);
+
             // 加载描述信息
-            List<ProtoFileDesc> protoFileDescList = DescriptorLoader.loadDesc(descriptorTarget.getOutputDirectory());
+            List<ProtoFileDesc> protoFileDescList = DescriptorLoader.loadDesc(descriptor.getOutputFile());
 
             MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescList);
 
