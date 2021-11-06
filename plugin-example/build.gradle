@@ -12,6 +12,12 @@ buildscript {
 
 apply plugin: 'io.github.ceragon.proto'
 
+ext {
+    PROJECT_PACKAGE_PATH = PROJECT_PACKAGE.replaceAll("\\.", "/")
+    mathMax = { left, right ->
+        return left > right ? left : right
+    }
+}
 
 proto {
     protocVersion = "3.11.4"
@@ -26,19 +32,29 @@ proto {
             type = "cpp"
         }
     }
+//    outputBigDescriptors {
+//        desc {
+//            outputFile = baseDir("build/temp-descriptor/all.des")
+//            includeSourceInfo = true
+//        }
+//    }
     // 获取全部的协议，用于生成文件
     totalMsgBuilds {
         commandCode {
             // template 目录下的模板名称
             vmFile = "HOpCommand.vm"
-            targetFile = baseDir("build/java/com/ceragon/monkeygame/proto/HOpCommand.java")
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}/proto/HOpCommand.java")
+        }
+        enumCode {
+            vmFile = "EnumUtil.vm"
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}/proto/EnumUtil.java")
         }
     }
     // 遍历每个message，用于生成文件
     everyMsgBuilds {
         build1 {
             vmFile = "LoginMsgCommand.vm"
-            targetFile = baseDir('build/java/com/ceragon/monkeygame/hall/command/login/${MsgName}Command.java')
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}" + '/hall/command/login/${MsgName}Command.java')
             overwrite = false
             // message 名字匹配规则，支持正则表达式
             msgNameMatch = [".*Request"]
@@ -47,7 +63,7 @@ proto {
         }
         build2 {
             vmFile = "IMsgCommand.vm"
-            targetFile = baseDir('build/java/com/ceragon/monkeygame/command/I${MsgName}Command.java')
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}" + '/command/I${MsgName}Command.java')
             overwrite = true
             msgNameMatch = [".*Request"]
             protoNameMatch = [".*"]
@@ -57,9 +73,17 @@ proto {
     everyProtoBuilds {
         build1 {
             vmFile = "LoginCommandManager.vm"
-            targetFile = baseDir('build/java/com/ceragon/monkeygame/hall/command/login/LoginCommandManager.java')
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}/hall/command/login/LoginCommandManager.java")
             // proto 文件名称匹配规则，支持正则表达式
             protoNameMatch = [".*ProtoLogin.proto"]
+        }
+    }
+
+    // 遍历每个枚举，用于生成文件
+    everyEnumBuilds {
+        build {
+            vmFile = "EnumStructure.vm"
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}" + '/hall/Enum${EnumName}.java');
         }
     }
 }

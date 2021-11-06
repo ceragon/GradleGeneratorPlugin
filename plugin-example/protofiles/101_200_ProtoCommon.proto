@@ -4,6 +4,7 @@ option java_outer_classname = "ProtoCommon";
 option java_multiple_files = true;
 import "ProtoBase.proto";
 
+// 消息参数枚举
 message NoticeParam{
   Type type = 1; // 参数类型
   int32 code = 2;

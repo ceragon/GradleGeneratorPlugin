@@ -1,7 +1,0 @@
-syntax = "proto3";
-option java_package = "io.github.ceragon.proto";
-
-message Bar{
-  int32 foo = 1;
-  repeated int32 bar = 2;
-}

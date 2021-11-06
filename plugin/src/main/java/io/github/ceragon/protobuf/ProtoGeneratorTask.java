@@ -1,8 +1,7 @@
 package io.github.ceragon.protobuf;
 
-import io.github.ceragon.protobuf.bean.ProtoFileDesc;
+import io.github.ceragon.protobuf.bean.FileDescriptorDelegate;
 import io.github.ceragon.protobuf.extension.OutputBigDescriptor;
-import io.github.ceragon.protobuf.extension.OutputTarget;
 import io.github.ceragon.protobuf.extension.ProtoExtension;
 import io.github.ceragon.protobuf.protoc.DescriptorLoader;
 import io.github.ceragon.protobuf.protoc.MsgCodeBuild;
@@ -42,7 +41,7 @@ public class ProtoGeneratorTask {
             protocBuild.process(extension.getOutputTargets(), outputBigDescriptors);
 
             // 加载描述信息
-            List<ProtoFileDesc> protoFileDescList = DescriptorLoader.loadDesc(descriptor.getOutputFile());
+            List<FileDescriptorDelegate> protoFileDescList = DescriptorLoader.loadDesc(descriptor.getOutputFile());
 
             MsgCodeBuild msgCodeBuild = new MsgCodeBuild(protoFileDescList);
 
@@ -56,6 +55,9 @@ public class ProtoGeneratorTask {
             }
             if (!msgCodeBuild.buildEveryProtoCode(resourceRoot, extension.getEveryProtoBuilds())) {
                 throw new PluginTaskException("build everyProto code error");
+            }
+            if (!msgCodeBuild.buildEveryEnumCode(resourceRoot, extension.getEveryEnumBuilds())) {
+                throw new PluginTaskException("build everyEnum code error");
             }
         } catch (Throwable e) {
             throw new TaskExecutionException(task, e);

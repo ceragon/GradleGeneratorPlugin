@@ -1,0 +1,24 @@
+package ${PROJECT_PACKAGE}.proto;
+public class EnumUtil {
+    #foreach($msgGroup in $totalMsgGroupList)
+        #foreach($enum1 in $msgGroup.enumList)
+    /**
+    * ${enum1.comments}
+    */
+    public enum ${enum1.name}{
+                #foreach($value in $enum1.valueList)
+        /** ${value.comments} */
+        ${value.name}(${value.number}),
+                #end
+        ;
+        private final int number;
+        ${enum1.name}(int number){
+            this.number = number;
+        }
+        public int getNumber () {
+            return this.number;
+        }
+    }
+        #end
+    #end
+}

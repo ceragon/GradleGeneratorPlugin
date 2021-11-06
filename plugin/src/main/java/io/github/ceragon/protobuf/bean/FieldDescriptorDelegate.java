@@ -1,5 +1,6 @@
 package io.github.ceragon.protobuf.bean;
 
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import lombok.Builder;
@@ -8,8 +9,9 @@ import lombok.Builder;
  * 单个 message 中单个字段的描述信息
  */
 @Builder
-public class ProtoMessageFieldDesc implements IProtoDesc {
+public class FieldDescriptorDelegate implements IProtoDesc {
     private FieldDescriptor orig;
+    private SourceCodeInfo sourceCodeInfo;
     private Location location;
 
     /**

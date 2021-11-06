@@ -12,7 +12,6 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +37,8 @@ public class ProtoExtension {
     private final NamedDomainObjectContainer<TotalMsgBuildConfig> totalMsgBuilds;
     @Internal("遍历每个消息来生成代码")
     private final NamedDomainObjectContainer<EveryMsgBuildConfig> everyMsgBuilds;
+    @Internal("遍历每个枚举来生成代码")
+    private final NamedDomainObjectContainer<EveryEnumBuildConfig> everyEnumBuilds;
     @Internal("遍历每个proto文件来生成代码")
     private final NamedDomainObjectContainer<EveryProtoBuildConfig> everyProtoBuilds;
 
@@ -50,6 +51,7 @@ public class ProtoExtension {
         outputBigDescriptors = project.container(OutputBigDescriptor.class);
         totalMsgBuilds = project.container(TotalMsgBuildConfig.class);
         everyMsgBuilds = project.container(EveryMsgBuildConfig.class);
+        everyEnumBuilds = project.container(EveryEnumBuildConfig.class);
         everyProtoBuilds = project.container(EveryProtoBuildConfig.class);
         templatePath = PluginContext.pathFormat().format("${project.base.dir}${s}template");
     }
@@ -97,6 +99,14 @@ public class ProtoExtension {
 
     public void everyMsgBuilds(Action<NamedDomainObjectContainer<EveryMsgBuildConfig>> block) {
         block.execute(this.everyMsgBuilds);
+    }
+
+    public void everyEnumBuilds(Closure<?> block) {
+        ConfigureUtil.configure(block, this.everyEnumBuilds);
+    }
+
+    public void everyEnumBuilds(Action<NamedDomainObjectContainer<EveryEnumBuildConfig>> block) {
+        block.execute(this.everyEnumBuilds);
     }
 
     public void everyProtoBuilds(Closure<?> block) {

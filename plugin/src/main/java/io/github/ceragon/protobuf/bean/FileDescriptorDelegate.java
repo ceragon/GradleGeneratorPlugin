@@ -2,23 +2,23 @@ package io.github.ceragon.protobuf.bean;
 
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import lombok.Builder;
-import lombok.Singular;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 单个proto文件的描述信息
  */
 @Builder
-public class ProtoFileDesc {
+public class FileDescriptorDelegate {
     private FileDescriptorProto orig;
     private FileDescriptor fdOrig;
     private SourceCodeInfo sourceCodeInfo;
-    @Singular(value = "message")
-    private List<ProtoMessageDesc> messageList;
-    private List<ProtoEnumDesc> enumList;
+    private List<MessageDescriptorDelegate> messageList;
+    private List<EnumDescriptorDelegate> enumList;
 
     /**
      * 获取 proto 文件原始描述信息，全部接口详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.FileDescriptorProto.html
@@ -47,8 +47,24 @@ public class ProtoFileDesc {
      *
      * @return 描述信息列表
      */
-    public List<ProtoMessageDesc> getMessageList() {
+    public List<MessageDescriptorDelegate> getMessageList() {
+        if (messageList == null) {
+            messageList = fdOrig.getMessageTypes().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, descriptor.getIndex());
+                return MessageDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
+            }).collect(Collectors.toList());
+        }
         return messageList;
+    }
+
+    public List<EnumDescriptorDelegate> getEnumList() {
+        if (enumList == null) {
+            enumList = fdOrig.getEnumTypes().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, descriptor.getIndex());
+                return EnumDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
+            }).collect(Collectors.toList());
+        }
+        return enumList;
     }
 
     /**

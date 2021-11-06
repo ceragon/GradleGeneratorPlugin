@@ -1,0 +1,15 @@
+package ${PROJECT_PACKAGE}.proto
+public enum Enum${enum.name}{
+    #foreach($value in $enum.valueList)
+                /** ${value.comments} */
+    ${value.name}(${value.number}),
+        #end
+    ;
+    private final int number;
+    ${enum.name}(int number){
+        this.number = number;
+    }
+    public int getNumber () {
+       return this.number;
+    }
+}

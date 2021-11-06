@@ -1,11 +1,11 @@
 package io.github.ceragon.protobuf.bean;
 
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.UnknownFieldSet.Field;
 import lombok.Builder;
-import lombok.Singular;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
  * proto的单个消息的描述信息
  */
 @Builder
-public class ProtoMessageDesc implements IProtoDesc{
+public class MessageDescriptorDelegate implements IProtoDesc {
     private Descriptor orig;
+    private SourceCodeInfo sourceCodeInfo;
     private Location location;
-    @Singular("field")
-    private List<ProtoMessageFieldDesc> fieldList;
+    private List<FieldDescriptorDelegate> fieldList;
+    private List<MessageDescriptorDelegate> messageList;
+    private List<EnumDescriptorDelegate> enumList;
 
     /**
      * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.Descriptor.html
@@ -31,6 +33,7 @@ public class ProtoMessageDesc implements IProtoDesc{
 
     /**
      * 消息的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html
+     *
      * @return 注释原始信息
      */
     public Location getLocation() {
@@ -42,8 +45,35 @@ public class ProtoMessageDesc implements IProtoDesc{
      *
      * @return 全部的字段描述信息
      */
-    public List<ProtoMessageFieldDesc> getFieldList() {
+    public List<FieldDescriptorDelegate> getFieldList() {
+        if (fieldList == null) {
+            fieldList = orig.getFields().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfField(sourceCodeInfo, orig.getIndex(), descriptor.getIndex());
+                return FieldDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
+
+            }).collect(Collectors.toList());
+        }
         return fieldList;
+    }
+
+    public List<MessageDescriptorDelegate> getMessageList() {
+        if (messageList == null) {
+            messageList = orig.getNestedTypes().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, descriptor.getIndex());
+                return MessageDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
+            }).collect(Collectors.toList());
+        }
+        return messageList;
+    }
+
+    public List<EnumDescriptorDelegate> getEnumList() {
+        if (enumList == null) {
+            enumList = orig.getEnumTypes().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, descriptor.getIndex());
+                return EnumDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
+            }).collect(Collectors.toList());
+        }
+        return enumList;
     }
 
     private Field getOptionField(int number) {
@@ -96,28 +126,27 @@ public class ProtoMessageDesc implements IProtoDesc{
      * @return 依赖的所有包名
      */
     public List<String> getDependencyPackage() {
-        return fieldList.stream()
-                .filter(field -> {
-                    switch (field.getOrig().getJavaType()) {
-                        case BYTE_STRING:
-                        case ENUM:
-                        case MESSAGE:
-                            return true;
-                        default:
-                            return false;
-                    }
-                }).map(field -> {
-                    switch (field.getOrig().getJavaType()) {
-                        case ENUM:
-                            return field.getOrig().getEnumType().getFullName();
-                        case MESSAGE:
-                            return field.getOrig().getMessageType().getFullName();
-                        case BYTE_STRING:
-                            return "com.google.protobuf.ByteString";
-                        default:
-                            return "";
-                    }
-                }).collect(Collectors.toList());
+        return fieldList.stream().filter(field -> {
+            switch (field.getOrig().getJavaType()) {
+                case BYTE_STRING:
+                case ENUM:
+                case MESSAGE:
+                    return true;
+                default:
+                    return false;
+            }
+        }).map(field -> {
+            switch (field.getOrig().getJavaType()) {
+                case ENUM:
+                    return field.getOrig().getEnumType().getFullName();
+                case MESSAGE:
+                    return field.getOrig().getMessageType().getFullName();
+                case BYTE_STRING:
+                    return "com.google.protobuf.ByteString";
+                default:
+                    return "";
+            }
+        }).collect(Collectors.toList());
     }
 
 }

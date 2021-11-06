@@ -1,5 +1,6 @@
 package io.github.ceragon.protobuf.bean;
 
+import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.UnknownFieldSet;
@@ -14,11 +15,11 @@ import java.util.stream.Collectors;
  * proto的单个消息的描述信息
  */
 @Builder
-public class ProtoEnumDesc implements IProtoDesc{
+public class EnumDescriptorDelegate implements IProtoDesc {
     private EnumDescriptor orig;
+    private SourceCodeInfo sourceCodeInfo;
     private Location location;
-    @Singular("value")
-    private List<ProtoEnumValueDesc> valueList;
+    private List<EnumValueDescriptorDelegate> valueList;
 
     /**
      * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.Descriptor.html
@@ -31,13 +32,20 @@ public class ProtoEnumDesc implements IProtoDesc{
 
     /**
      * 消息的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html
+     *
      * @return 注释原始信息
      */
     public Location getLocation() {
         return location;
     }
 
-    public List<ProtoEnumValueDesc> getValueList() {
+    public List<EnumValueDescriptorDelegate> getValueList() {
+        if (valueList == null) {
+            valueList = orig.getValues().stream().map(descriptor -> {
+                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, orig.getIndex(), descriptor.getIndex());
+                return EnumValueDescriptorDelegate.builder().orig(descriptor).location(location).build();
+            }).collect(Collectors.toList());
+        }
         return valueList;
     }
 

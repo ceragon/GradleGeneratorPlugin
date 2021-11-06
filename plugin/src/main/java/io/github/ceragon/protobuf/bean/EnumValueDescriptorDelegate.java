@@ -5,12 +5,20 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import lombok.Builder;
 
 @Builder
-public class ProtoEnumValueDesc implements IProtoDesc{
+public class EnumValueDescriptorDelegate implements IProtoDesc {
     private EnumValueDescriptor orig;
     private Location location;
 
     @Override
     public Location getLocation() {
         return location;
+    }
+
+    public String getName() {
+        return orig.getName();
+    }
+
+    public int getNumber() {
+        return orig.getNumber();
     }
 }

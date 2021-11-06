@@ -7,9 +7,7 @@ public class HOpCommand {
     #foreach($msg in $msgGroup.messageList)
         #set($msgId = $msg.getOptionInt(5000))
         #if($msgId != 0)
-            #if($msgId > $maxId)
-                #set($maxId = $msgId)
-            #end
+            #set($maxId = $mathMax.call($msgId, $maxId))
     // ${msg.comments}
     public final static short ${msg.name} = ${msgId};
         #end
