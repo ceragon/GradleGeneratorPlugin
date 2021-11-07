@@ -111,7 +111,7 @@ task cleanExample() {
     }
 }
 
-task zipAllExample(dependsOn: [cleanExample, zipSimpleExample, zipFullExample]) {
+task zipAllExample(group: 'release', dependsOn: [cleanExample, zipSimpleExample, zipFullExample]) {
     doLast {
         println 'success'
     }
