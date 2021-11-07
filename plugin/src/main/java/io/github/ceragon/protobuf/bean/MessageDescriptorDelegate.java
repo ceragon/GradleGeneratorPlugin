@@ -18,6 +18,7 @@ public class MessageDescriptorDelegate implements IProtoDesc {
     private Descriptor orig;
     private SourceCodeInfo sourceCodeInfo;
     private Location location;
+
     private List<FieldDescriptorDelegate> fieldList;
     private List<MessageDescriptorDelegate> messageList;
     private List<EnumDescriptorDelegate> enumList;
@@ -48,7 +49,7 @@ public class MessageDescriptorDelegate implements IProtoDesc {
     public List<FieldDescriptorDelegate> getFieldList() {
         if (fieldList == null) {
             fieldList = orig.getFields().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfField(sourceCodeInfo, orig.getIndex(), descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfField(sourceCodeInfo, this.location.getPathList(), descriptor.getIndex());
                 return FieldDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
 
             }).collect(Collectors.toList());
@@ -59,7 +60,7 @@ public class MessageDescriptorDelegate implements IProtoDesc {
     public List<MessageDescriptorDelegate> getMessageList() {
         if (messageList == null) {
             messageList = orig.getNestedTypes().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, this.location.getPathList(), descriptor.getIndex());
                 return MessageDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
             }).collect(Collectors.toList());
         }
@@ -69,7 +70,7 @@ public class MessageDescriptorDelegate implements IProtoDesc {
     public List<EnumDescriptorDelegate> getEnumList() {
         if (enumList == null) {
             enumList = orig.getEnumTypes().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, this.location.getPathList(), descriptor.getIndex());
                 return EnumDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
             }).collect(Collectors.toList());
         }

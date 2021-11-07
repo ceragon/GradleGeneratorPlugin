@@ -6,6 +6,7 @@ import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import lombok.Builder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class FileDescriptorDelegate {
     public List<MessageDescriptorDelegate> getMessageList() {
         if (messageList == null) {
             messageList = fdOrig.getMessageTypes().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfMessage(sourceCodeInfo, new ArrayList<>(), descriptor.getIndex());
                 return MessageDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
             }).collect(Collectors.toList());
         }
@@ -60,7 +61,7 @@ public class FileDescriptorDelegate {
     public List<EnumDescriptorDelegate> getEnumList() {
         if (enumList == null) {
             enumList = fdOrig.getEnumTypes().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, new ArrayList<>(), descriptor.getIndex());
                 return EnumDescriptorDelegate.builder().orig(descriptor).sourceCodeInfo(sourceCodeInfo).location(location).build();
             }).collect(Collectors.toList());
         }

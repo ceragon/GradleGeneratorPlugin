@@ -17,4 +17,6 @@ public interface I${msg.name}Command {
         ${field.javaTypeName} ${field.name} =request.get${util.upperFirstLetter($field.name)}();
     #end
     }
+
+
 }

@@ -68,6 +68,11 @@ proto {
             msgNameMatch = [".*Request"]
             protoNameMatch = [".*"]
         }
+        build3 {
+            vmFile = "InnerEnumStructure.vm"
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}" + '/proto/Message${MsgName}.java')
+            overwrite = true
+        }
     }
     // 遍历每个proto文件，用于生成文件
     everyProtoBuilds {

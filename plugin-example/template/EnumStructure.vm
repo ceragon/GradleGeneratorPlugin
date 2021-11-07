@@ -1,4 +1,8 @@
 package ${PROJECT_PACKAGE}.proto
+
+/**
+* ${enum.comments}
+*/
 public enum Enum${enum.name}{
     #foreach($value in $enum.valueList)
                 /** ${value.comments} */

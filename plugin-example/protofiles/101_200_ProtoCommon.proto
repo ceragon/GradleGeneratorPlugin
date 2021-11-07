@@ -9,6 +9,7 @@ message NoticeParam{
   Type type = 1; // 参数类型
   int32 code = 2;
   string str = 3;
+  // 类型枚举
   enum Type {
     STRING = 0; // 字符串类型
     LANG_ID = 1; // language表的Id

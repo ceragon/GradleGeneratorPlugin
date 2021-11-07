@@ -37,14 +37,18 @@ public interface IProtoDesc {
         if (StringUtils.isEmpty(leadingComments) && StringUtils.isEmpty(trailingComments)) {
             return "";
         }
-        if (StringUtils.isEmpty(leadingComments)) {
-            return getTrailingComments();
+        StringBuilder builder = new StringBuilder();
+        boolean flag = false;
+        if (!StringUtils.isEmpty(leadingComments)) {
+            flag = true;
+            builder.append(getLeadingComments().replaceAll("[\r\n]", " | "));
         }
-        if (StringUtils.isEmpty(trailingComments)) {
-            return getLeadingComments();
+        if (!StringUtils.isEmpty(trailingComments)) {
+            if (flag) {
+                builder.append(" | ");
+            }
+            builder.append(getTrailingComments().replaceAll("[\r\n]", " | "));
         }
-        return getLeadingComments().replaceAll("[\r\n]", " | ") +
-                " | " +
-                getTrailingComments().replaceAll("[\r\n]", " | ");
+        return builder.toString();
     }
 }

@@ -8,6 +8,7 @@ import com.google.protobuf.UnknownFieldSet.Field;
 import lombok.Builder;
 import lombok.Singular;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public class EnumDescriptorDelegate implements IProtoDesc {
     public List<EnumValueDescriptorDelegate> getValueList() {
         if (valueList == null) {
             valueList = orig.getValues().stream().map(descriptor -> {
-                Location location = DescriptorUtils.getLocationOfEnum(sourceCodeInfo, orig.getIndex(), descriptor.getIndex());
+                Location location = DescriptorUtils.getLocationOfEnumValue(sourceCodeInfo, this.location.getPathList(), descriptor.getIndex());
                 return EnumValueDescriptorDelegate.builder().orig(descriptor).location(location).build();
             }).collect(Collectors.toList());
         }
