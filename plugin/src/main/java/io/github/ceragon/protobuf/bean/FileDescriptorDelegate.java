@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 单个proto文件的描述信息
+ * 单个proto文件的描述信息代理类
  */
 @Builder
 public class FileDescriptorDelegate {
@@ -58,6 +58,10 @@ public class FileDescriptorDelegate {
         return messageList;
     }
 
+    /**
+     * 获取文件中定义的所有 枚举 的描述信息
+     * @return 枚举信息列表
+     */
     public List<EnumDescriptorDelegate> getEnumList() {
         if (enumList == null) {
             enumList = fdOrig.getEnumTypes().stream().map(descriptor -> {

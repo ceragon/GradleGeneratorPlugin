@@ -6,7 +6,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import lombok.Builder;
 
 /**
- * 单个 message 中单个字段的描述信息
+ * 单个 message 中单个字段的描述信息代理类
  */
 @Builder
 public class FieldDescriptorDelegate implements IProtoDesc {
@@ -61,9 +61,21 @@ public class FieldDescriptorDelegate implements IProtoDesc {
                 return "";
         }
     }
-
+    /**
+     * 消息字段的原始注释信息，详见：https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/DescriptorProtos.SourceCodeInfo.Location.html
+     *
+     * @return 注释原始信息
+     */
     @Override
     public Location getLocation() {
         return location;
+    }
+
+    /**
+     * 获取消息字段在proto文件中定义的序号
+     * @return 序号
+     */
+    public int getNumber(){
+        return orig.getNumber();
     }
 }

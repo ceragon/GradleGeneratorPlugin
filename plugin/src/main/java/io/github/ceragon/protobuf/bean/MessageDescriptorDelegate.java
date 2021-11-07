@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * proto的单个消息的描述信息
+ * proto的单个消息的描述信息代理类
  */
 @Builder
 public class MessageDescriptorDelegate implements IProtoDesc {
@@ -57,6 +57,17 @@ public class MessageDescriptorDelegate implements IProtoDesc {
         return fieldList;
     }
 
+    /**
+     * 获取消息定义的内部消息列表，例如：
+     * message Foo {
+     *     message Inner {
+     *         int32 bar = 1;
+     *     }
+     *     Inner inner = 1;
+     * }
+     * 这里获取的就是所有的Inner
+     * @return 内部消息列表
+     */
     public List<MessageDescriptorDelegate> getMessageList() {
         if (messageList == null) {
             messageList = orig.getNestedTypes().stream().map(descriptor -> {
@@ -66,7 +77,17 @@ public class MessageDescriptorDelegate implements IProtoDesc {
         }
         return messageList;
     }
-
+    /**
+     * 获取消息定义的内部枚举列表，例如：
+     * message Foo {
+     *     enum Inner {
+     *         BAR = 0;
+     *     }
+     *     Inner inner = 1;
+     * }
+     * 这里获取的就是所有的Inner
+     * @return 内部枚举列表
+     */
     public List<EnumDescriptorDelegate> getEnumList() {
         if (enumList == null) {
             enumList = orig.getEnumTypes().stream().map(descriptor -> {

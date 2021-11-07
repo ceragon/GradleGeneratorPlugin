@@ -6,14 +6,12 @@ import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.UnknownFieldSet.Field;
 import lombok.Builder;
-import lombok.Singular;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * proto的单个消息的描述信息
+ * proto的单个枚举的描述信息代理类
  */
 @Builder
 public class EnumDescriptorDelegate implements IProtoDesc {
@@ -23,7 +21,7 @@ public class EnumDescriptorDelegate implements IProtoDesc {
     private List<EnumValueDescriptorDelegate> valueList;
 
     /**
-     * 消息的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.Descriptor.html
+     * 枚举的原始描述信息, 全部接口详见 https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Descriptors.EnumDescriptor
      *
      * @return 原始描述信息
      */
@@ -40,6 +38,10 @@ public class EnumDescriptorDelegate implements IProtoDesc {
         return location;
     }
 
+    /**
+     * 获取枚举的值列表
+     * @return 枚举的值列表
+     */
     public List<EnumValueDescriptorDelegate> getValueList() {
         if (valueList == null) {
             valueList = orig.getValues().stream().map(descriptor -> {
@@ -59,7 +61,7 @@ public class EnumDescriptorDelegate implements IProtoDesc {
     }
 
     /**
-     * 获取消息中定义的 option 字段，返回值为整型
+     * 获取枚举中定义的 option 字段，返回值为整型
      *
      * @param number option 字段的唯一Id，详见 https://developers.google.com/protocol-buffers/docs/overview?hl=en#options
      * @return 将 option 字段的值以整型返回，默认值为 0
@@ -76,7 +78,7 @@ public class EnumDescriptorDelegate implements IProtoDesc {
     }
 
     /**
-     * 获取 message 所在 proto 文件中定义的 java 包名
+     * 获取 枚举 所在 proto 文件中定义的 java 包名
      *
      * @return java 包名
      */
@@ -85,7 +87,7 @@ public class EnumDescriptorDelegate implements IProtoDesc {
     }
 
     /**
-     * 获取消息的名称
+     * 获取枚举的名称
      *
      * @return 消息名称
      */
