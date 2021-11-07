@@ -10,7 +10,7 @@ subprojects {
     }
 
     group = "io.github.ceragon"
-    version = "1.2"
+    version = PLUGIN_VERSION
 
     repositories {
         // Use Maven Central for resolving dependencies.
