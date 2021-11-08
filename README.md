@@ -37,7 +37,7 @@ gradle generator plugin 是一个使用java语言编写的gradle插件。 你可
 
 ```groovy
 plugins {
-    id "io.github.ceragon.proto" version "1.2"
+    id "io.github.ceragon.proto" version "1.3"
 }
 ```
 
