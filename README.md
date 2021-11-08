@@ -11,7 +11,10 @@ gradle generator plugin 是一个使用java语言编写的gradle插件。 你可
 
 用于生成官方的 protobuf 代码
 
-1. 点击下载基础文件目录 [proto-simple.zip](https://github.com/ceragon/GradleGeneratorPlugin/releases/download/v1.1/proto-simple.zip)
+1.
+
+点击下载基础文件目录 [proto-simple.zip](https://github.com/ceragon/GradleGeneratorPlugin/releases/download/v1.1/proto-simple.zip)
+
 2. 解压到某个目录
 3. 在目录的 protofiles 目录中添加自定义的 proto 文件
 4. 执行 proto-build.bat 或者 proto-build.sh
@@ -41,3 +44,58 @@ plugins {
 }
 ```
 
+## 配置说明
+
+上述两种方式，无论哪种都需要在build.gradle中配置相关参数，以下是完整的目录结构
+```
+.
+├── gradle
+│   └── wrapper
+│       └── gradle-wrapper.jar
+│       └── gralde-wrapper.properties
+├── protofiles
+│   ...
+│   └── *.proto
+├── template   
+│   ...
+│   └── *.vm
+├── build.gradle
+├── gradle.properties
+├── gradle.properties
+└── settings.gradle
+```
+下面是参数配置示例：
+
+```groovy
+build.gradle
+
+proto {
+    protocVersion = "3.11.4"
+    outputTargets {
+        javaCode {
+            type = "java"
+        }
+        cppCode {
+            type = "cpp"
+        }
+    }
+    totalMsgBuilds {
+        commandCode {
+            // template 目录下的模板名称
+            vmFile = "HOpCommand.vm"
+            targetFile = baseDir("build/java/com/ceragon/game/proto/HOpCommand.java")
+        }
+    }
+    everyMsgBuilds {
+        msgCommand {
+            vmFile = "LoginMsgCommand.vm"
+            targetFile = baseDir('build/java/com/ceragon/game/hall/command/login/${MsgName}Command.java')
+            overwrite = false
+            // message 名字匹配规则，支持正则表达式
+            msgNameMatch = [".*Request"]
+            // proto 文件名称匹配规则，支持正则表达式
+            protoNameMatch = [".*ProtoLogin.proto"]
+        }
+    }
+}
+```
