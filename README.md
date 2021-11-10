@@ -46,7 +46,12 @@ plugins {
 
 ## 配置说明
 
-上述两种方式，无论哪种都需要在build.gradle中配置相关参数，以下是完整的目录结构
+上述两种方式，无论哪种都需要在build.gradle中配置相关参数。
+
+### 目录结构
+
+以下是独立方式下的完整的目录结构，插件方式也类似:
+
 ```
 .
 ├── gradle
@@ -61,14 +66,22 @@ plugins {
 │   └── *.vm
 ├── build.gradle
 ├── gradle.properties
-├── gradle.properties
+├── gradlew
+├── gradlew.bat
 └── settings.gradle
 ```
-下面是参数配置示例：
+
+### 生成官方的protobuf代码
+
+本插件的核心功能是生成官方的protobuf代码，遵从开箱即用的设计理念。通过简单的配置，就可以直接生成代码，无需额外步骤。
+
+#### build.gradle 的配置
 
 ```groovy
-build.gradle
 
+plugins {
+    id 'io.github.ceragon.proto' version '1.3'
+}
 proto {
     protocVersion = "3.11.4"
     outputTargets {
@@ -79,23 +92,29 @@ proto {
             type = "cpp"
         }
     }
-    totalMsgBuilds {
-        commandCode {
-            // template 目录下的模板名称
-            vmFile = "HOpCommand.vm"
-            targetFile = baseDir("build/java/com/ceragon/game/proto/HOpCommand.java")
-        }
-    }
-    everyMsgBuilds {
-        msgCommand {
-            vmFile = "LoginMsgCommand.vm"
-            targetFile = baseDir('build/java/com/ceragon/game/hall/command/login/${MsgName}Command.java')
-            overwrite = false
-            // message 名字匹配规则，支持正则表达式
-            msgNameMatch = [".*Request"]
-            // proto 文件名称匹配规则，支持正则表达式
-            protoNameMatch = [".*ProtoLogin.proto"]
-        }
-    }
 }
 ```
+
+#### 配置说明
+
+- protocVersion : 声明protoc的版本号，完整版本号可以查看 [protoc版本号](https://repo.maven.apache.org/maven2/com/google/protobuf/protoc/)
+- outputTargets : 用于配置生成代码的类型，等效于protoc 命令行中的 --java_out --cpp_out 等参数
+- javaCode 和 cppCode : 这两个值用于表示名称，可以任意起，在 outputTargets 闭包中不重复即可
+- type : 声明要生成的protobuf官方代码的类别，type的值和 protoc 命令行中的 --java_out --cpp_out 保持一致
+
+> 如果想生成 C# 的代码，C# 对应的 protoc 生成命令是 --csharp_out，则type应该填写 csharp
+
+#### 运行生成
+
+##### 命令行执行
+
+```shell
+// windows 下执行 .\gradlew.bat proto
+sh gradlew proto
+```
+
+##### idea中执行
+
+可以在idea的gradle插件中直接运行，位于 Tasks -> other -> proto
+
+![idea-run-proto](res/idea-run-proto.png)
