@@ -13,25 +13,61 @@ import io.github.ceragon.util.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class DescriptorLoader {
+    private final static Set<String> SPECIAL_DECENDENCYS = new HashSet<String>(){
+        {
+            add("google/protobuf/descriptor.proto");
+        }
+    };
+    private static ConcurrentMap<String, FileDescriptor> descriptorMap = new ConcurrentHashMap<>();
     public static List<FileDescriptorDelegate> loadDesc(String descPathStr) {
         try (FileInputStream fin = new FileInputStream(descPathStr)) {
             FileDescriptorSet descriptorSet = FileDescriptorSet.parseFrom(fin);
-            return descriptorSet.getFileList().stream().map(DescriptorLoader::toFileDesc).collect(Collectors.toList());
+            return descriptorSet.getFileList().stream().parallel()
+                    .map(DescriptorLoader::toFileDesc).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            descriptorMap.clear();
         }
     }
+
 
     private static FileDescriptorDelegate toFileDesc(FileDescriptorProto fdp) {
         SourceCodeInfo sourceCodeInfo = fdp.getSourceCodeInfo();
         try {
-            FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{}, true);
+            FileDescriptor fd;
+            if (fdp.getDependencyList().isEmpty()) {
+                fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{}, true);
+            } else {
+                List<FileDescriptor> descriptors = new ArrayList<>();
+                for (String dependency : fdp.getDependencyList()) {
+                    if (SPECIAL_DECENDENCYS.contains(dependency)) {
+                        continue;
+                    }
+                    FileDescriptor descriptor;
+                    do{
+                        descriptor = descriptorMap.get(dependency);
+                        if (descriptor == null) {
+                            TimeUnit.SECONDS.sleep(1);
+                        }
+                    }while(descriptor == null);
+                    descriptors.add(descriptor);
+                }
+                fd = FileDescriptor.buildFrom(fdp, descriptors.toArray(new FileDescriptor[0]), true);;
+            }
+            descriptorMap.put(fdp.getName(), fd);
             return FileDescriptorDelegate.builder().orig(fdp).fdOrig(fd).sourceCodeInfo(sourceCodeInfo).build();
-        } catch (DescriptorValidationException e) {
+        } catch (DescriptorValidationException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
