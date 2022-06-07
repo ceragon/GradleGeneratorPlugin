@@ -14,25 +14,30 @@ import io.github.ceragon.util.StringUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class DescriptorLoader {
-    private final static Set<String> SPECIAL_DECENDENCYS = new HashSet<String>(){
+    private final static Set<String> SPECIAL_DECENDENCYS = new HashSet<String>() {
         {
             add("google/protobuf/descriptor.proto");
         }
     };
-    private static ConcurrentMap<String, FileDescriptor> descriptorMap = new ConcurrentHashMap<>();
+    private static Map<String, FileDescriptorProto> allFdpMap;
+    private static final ConcurrentMap<String, FileDescriptor> descriptorMap = new ConcurrentHashMap<>();
+
     public static List<FileDescriptorDelegate> loadDesc(String descPathStr) {
         try (FileInputStream fin = new FileInputStream(descPathStr)) {
             FileDescriptorSet descriptorSet = FileDescriptorSet.parseFrom(fin);
-            return descriptorSet.getFileList().stream().parallel()
+            allFdpMap = descriptorSet.getFileList().stream()
+                    .collect(HashMap::new, (fdpMap, fdp) -> fdpMap.put(fdp.getName(), fdp), Map::putAll);
+            return descriptorSet.getFileList().stream()
                     .map(DescriptorLoader::toFileDesc).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -44,30 +49,25 @@ public class DescriptorLoader {
 
     private static FileDescriptorDelegate toFileDesc(FileDescriptorProto fdp) {
         SourceCodeInfo sourceCodeInfo = fdp.getSourceCodeInfo();
-        try {
-            FileDescriptor fd;
-            if (fdp.getDependencyList().isEmpty()) {
-                fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{}, true);
-            } else {
-                List<FileDescriptor> descriptors = new ArrayList<>();
-                for (String dependency : fdp.getDependencyList()) {
-                    if (SPECIAL_DECENDENCYS.contains(dependency)) {
-                        continue;
-                    }
-                    FileDescriptor descriptor;
-                    do{
-                        descriptor = descriptorMap.get(dependency);
-                        if (descriptor == null) {
-                            TimeUnit.SECONDS.sleep(1);
-                        }
-                    }while(descriptor == null);
-                    descriptors.add(descriptor);
-                }
-                fd = FileDescriptor.buildFrom(fdp, descriptors.toArray(new FileDescriptor[0]), true);;
+        FileDescriptor fd = descriptorMap.computeIfAbsent(fdp.getName(), DescriptorLoader::loadFileDescriptor);
+        return FileDescriptorDelegate.builder().orig(fdp).fdOrig(fd).sourceCodeInfo(sourceCodeInfo).build();
+    }
+
+    private static FileDescriptor loadFileDescriptor(String name) {
+        FileDescriptorProto fdp = allFdpMap.get(name);
+        if (fdp == null) {
+            throw new RuntimeException(String.format("the FileDescriptorProto=%s is not exist!", name));
+        }
+        List<FileDescriptor> descriptors = new ArrayList<>();
+        for (String dependency : fdp.getDependencyList()) {
+            if (SPECIAL_DECENDENCYS.contains(dependency)) {
+                continue;
             }
-            descriptorMap.put(fdp.getName(), fd);
-            return FileDescriptorDelegate.builder().orig(fdp).fdOrig(fd).sourceCodeInfo(sourceCodeInfo).build();
-        } catch (DescriptorValidationException | InterruptedException e) {
+            descriptors.add(descriptorMap.computeIfAbsent(dependency, DescriptorLoader::loadFileDescriptor));
+        }
+        try {
+            return FileDescriptor.buildFrom(fdp, descriptors.toArray(new FileDescriptor[0]), true);
+        } catch (DescriptorValidationException e) {
             throw new RuntimeException(e);
         }
     }
