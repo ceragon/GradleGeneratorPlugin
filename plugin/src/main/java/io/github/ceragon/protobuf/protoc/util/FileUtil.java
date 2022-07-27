@@ -6,14 +6,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.List;
 
 public class FileUtil {
     public static File createTempDir(String name) throws PluginTaskException {
         try {
-            File tmpDir = File.createTempFile(name, "");
-            tmpDir.delete();
-            tmpDir.mkdirs();
+            File tmpDir = Files.createTempDirectory(name).toFile();
             tmpDir.deleteOnExit();
             return tmpDir;
         } catch (IOException e) {
