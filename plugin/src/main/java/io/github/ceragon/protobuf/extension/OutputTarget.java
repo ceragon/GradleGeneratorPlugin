@@ -13,11 +13,15 @@ public class OutputTarget {
     @Internal("生成语言类型")
     String type = "java";
 
-    @Internal("是否预先清理之前生成的文件")
+    @Internal("是否预先清理之前生成的文件夹")
     boolean cleanOutputFolder = true;
+
+    @Internal("是否覆盖之前生成文件")
+    boolean overwriteOutputFile = false;
+
     @Internal("导出目录")
     String outputDirectory;
-;
+
     @Internal("导出的可选项，支持protoc的所有配置")
     String outputOptions;
 

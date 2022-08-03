@@ -91,7 +91,7 @@ public class OutputTargetUtil {
             if (inputFile.exists() && inputFile.isDirectory()) {
                 Collection<File> protoFiles = FileUtils.listFiles(inputFile, fileFilter, TrueFileFilter.INSTANCE);
                 for (File protoFile : protoFiles) {
-                    if (target.isCleanOutputFolder()) {
+                    if (target.isCleanOutputFolder() || target.isOverwriteOutputFile()) {
                         processFile(includeDirectoryList, protocCommand, protoFile, targetType, null,
                                 target.getOutputDirectory(), target.getOutputOptions());
                     } else {
