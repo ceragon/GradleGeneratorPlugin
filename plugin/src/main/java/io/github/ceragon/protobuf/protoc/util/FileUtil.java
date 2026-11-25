@@ -1,6 +1,7 @@
 package io.github.ceragon.protobuf.protoc.util;
 
 import io.github.ceragon.util.PluginTaskException;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,5 +39,17 @@ public class FileUtil {
             return true;
         }
         return matches.stream().anyMatch(targetName::matches);
+    }
+
+    /**
+     * 取 proto 文件名的主名：去掉目录前缀和 .proto 后缀。
+     * "ProtoLogin.proto" -> "ProtoLogin"
+     * "net/ProtoLogin.proto" -> "ProtoLogin"
+     *
+     * @param protoFileName proto 文件名，可能带目录前缀
+     * @return 去掉目录和扩展名后的文件名
+     */
+    public static String protoNameOf(String protoFileName) {
+        return FilenameUtils.getBaseName(protoFileName);
     }
 }

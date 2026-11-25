@@ -1,0 +1,9 @@
+file: $proto.name
+messages:
+#foreach($message in $proto.messageList)
+  - $message.name
+#end
+enums:
+#foreach($enum in $proto.enumList)
+  - $enum.name
+#end
