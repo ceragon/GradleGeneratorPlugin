@@ -1,7 +1,7 @@
 plugins {
     /** 可选，用于增加 clean 的 task */
     id 'base'
-    id 'io.github.ceragon.proto' version '1.4.0'
+    id 'io.github.ceragon.proto' version '1.3'
 }
 
 proto {
@@ -145,14 +145,18 @@ proto {
             protoNameMatch = [".*ProtoLogin.proto"]
         }
         /** 每个 proto 文件生成一个文件：targetFile 支持 ${ProtoName} 占位符（取文件名，去掉目录和 .proto 后缀） */
-        /** 注意：必须用单引号，双引号会被 Groovy 在配置阶段就插值 */
-        build2 {
-            vmFile = "ProtoIndex.vm"
-            targetFile = baseDir('build/java/com/ceragon/monkeygame/proto/register/${ProtoName}.txt')
-            /** proto 文件名称匹配规则，支持正则表达式 */
-            protoNameMatch = [".*"]
-            /** message 名称匹配规则，支持正则表达式；只有包含至少一个匹配 message 的 proto 文件才会生成 */
-            msgNameMatch = [".*Request"]
-        }
+        /** 需要包含该特性的插件版本才会生效；本地验证：
+         *    根目录：gradlew :plugin:publishToMavenLocal "-PPLUGIN_VERSION=1.3.4-local"
+         *    本目录：gradlew -b full-build.gradle "-PpluginVersion=1.3.4-local" proto
+         *  plugins 块里的版本号不能引用属性，需先改成实际版本号（并取消下面注释）才能生效
+         */
+//        build2 {
+//            vmFile = "ProtoMeta.vm"
+//            targetFile = baseDir('build/proto-meta/${ProtoName}.txt')
+//            /** proto 文件名称匹配规则，支持正则表达式 */
+//            protoNameMatch = [".*"]
+//            /** message 名称匹配规则，支持正则表达式；只有包含至少一个匹配 message 的 proto 文件才会生成 */
+//            msgNameMatch = [".*Request"]
+//        }
     }
 }
