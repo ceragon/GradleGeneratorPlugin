@@ -109,7 +109,7 @@ public class MsgCodeBuild {
      * 配置了 msgNameMatch 时，只有包含至少一个匹配 message 的 proto 文件才会生成代码
      */
     private boolean protoHasMatchMsg(FileDescriptorDelegate desc, EveryProtoBuildConfig config) {
-        if (config.getMsgNameMatch() == null || config.getMsgNameMatch().isEmpty()) {
+        if (config.getMsgNameMatch().isEmpty()) {
             return true;
         }
         return desc.getMessageList().stream()

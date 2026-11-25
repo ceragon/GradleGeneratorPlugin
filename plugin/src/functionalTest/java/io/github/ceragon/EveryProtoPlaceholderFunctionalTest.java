@@ -106,6 +106,33 @@ class EveryProtoPlaceholderFunctionalTest {
                 "Beta.proto has CL_Beta so it must be generated");
     }
 
+    @Test
+    void placeholderGeneratesEveryFileEvenWithOverwriteDisabled() throws IOException {
+        File projectDir = prepareProject("nooverwrite");
+        writeString(new File(projectDir, "build.gradle"), ""
+                + "plugins {\n"
+                + "    id('io.github.ceragon.proto')\n"
+                + "}\n"
+                + "\n"
+                + "proto {\n"
+                + "    everyProtoBuilds {\n"
+                + "        perProto {\n"
+                + "            vmFile = 'ProtoRegister.vm'\n"
+                + "            targetFile = baseDir('build/gen/${ProtoName}Register.txt')\n"
+                + "            overwrite = false\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+
+        runProto(projectDir);
+
+        // overwrite=false 以前会让第二个 proto 直接跳过，带上占位符后每个 proto 各写各的文件
+        assertTrue(new File(projectDir, "build/gen/AlphaRegister.txt").exists(),
+                "expected build/gen/AlphaRegister.txt to be generated with overwrite = false");
+        assertTrue(new File(projectDir, "build/gen/BetaRegister.txt").exists(),
+                "expected build/gen/BetaRegister.txt to be generated with overwrite = false");
+    }
+
     private File prepareProject(String name) throws IOException {
         File projectDir = new File("build/functionalTestEveryProto/" + name);
         deleteRecursively(projectDir);

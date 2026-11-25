@@ -1,0 +1,43 @@
+name: Release
+
+# 发版：推 v* tag 触发，或手动 dispatch 重试。
+# 需要在仓库 Secrets 里配置 GRADLE_PUBLISH_KEY / GRADLE_PUBLISH_SECRET（Gradle Plugin Portal 的 API Key）。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Check tag matches PLUGIN_VERSION
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION="$(sed -n 's/^PLUGIN_VERSION=//p' gradle.properties | tr -d '[:space:]')"
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "tag=$TAG PLUGIN_VERSION=$VERSION"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} 与 gradle.properties 的 PLUGIN_VERSION=${VERSION} 不一致"
+            exit 1
+          fi
+
+      - name: Test
+        run: ./gradlew check --no-daemon
+
+      - name: Publish to Gradle Plugin Portal
+        run: ./gradlew :plugin:publishPlugins --no-daemon
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}

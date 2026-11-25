@@ -41,3 +41,35 @@ plugins {
 }
 ```
 
+### 生成配置里的占位符与过滤
+
+`targetFile` 支持以下占位符，大小写三种写法都能用（例如 `${MsgName}`、`${msgname}`、`${MSGNAME}`）：
+
+| 占位符 | 用于 | 取值 |
+| --- | --- | --- |
+| `${MsgName}` | `everyMsgBuilds` | message 名 |
+| `${EnumName}` | `everyEnumBuilds` | 枚举名 |
+| `${ProtoName}` | `everyProtoBuilds` | proto 文件名去掉目录和 `.proto` 后缀，`net/ProtoLogin.proto` → `ProtoLogin` |
+
+`everyMsgBuilds`、`everyProtoBuilds`、`everyEnumBuilds` 都可以用正则做过滤，正则按**全匹配**生效：
+
+- `protoNameMatch`：按 proto 文件名过滤
+- `msgNameMatch`：`everyMsgBuilds` 里按 message 名过滤；`everyProtoBuilds` 里表示「该 proto 至少包含一个匹配的 message 才生成代码」，只看顶层 message
+- `enumNameMatch`：按枚举名过滤
+
+`everyProtoBuilds` 会为每个命中的 proto 渲染一次模板，但**不会自动区分文件名**：`targetFile` 里不带 `${ProtoName}` 时多次渲染都写同一个路径（`overwrite` 为 true 只剩最后一个，为 false 只剩第一个）。想让一个 proto 产出一个文件，必须显式带上占位符：
+
+```groovy
+proto {
+    everyProtoBuilds {
+        perProto {
+            vmFile = "ProtoMeta.vm"
+            targetFile = baseDir('build/proto-meta/${ProtoName}.txt')
+            msgNameMatch = [".*Request"]
+        }
+    }
+}
+```
+
+注意 `targetFile` 里的占位符必须写在**单引号**字符串里，双引号会被 Groovy 在配置阶段当作变量插值。不同目录下的同名 proto 会得到相同的 `${ProtoName}`，仍然会互相覆盖。
+
