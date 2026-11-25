@@ -82,6 +82,16 @@ proto {
             // proto 文件名称匹配规则，支持正则表达式
             protoNameMatch = [".*ProtoLogin.proto"]
         }
+        // 每个 proto 文件生成一个文件：targetFile 支持 ${ProtoName} 占位符（取文件名，去掉目录和 .proto 后缀）
+        // 注意：必须用单引号，双引号会被 Groovy 在配置阶段就插值
+        build2 {
+            vmFile = "LoginCommandManager.vm"
+            targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}" + '/hall/command/Proto${ProtoName}Manager.java')
+            // proto 文件名称匹配规则，支持正则表达式
+            protoNameMatch = [".*"]
+            // message 名称匹配规则，支持正则表达式；只有包含至少一个匹配 message 的 proto 文件才会生成
+            msgNameMatch = ["CL_.*"]
+        }
     }
 
     // 遍历每个枚举，用于生成文件

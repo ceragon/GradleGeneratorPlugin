@@ -144,5 +144,16 @@ proto {
             /** proto 文件名称匹配规则，支持正则表达式 */
             protoNameMatch = [".*ProtoLogin.proto"]
         }
+        /** 每个 proto 文件生成一个文件：targetFile 支持 ${ProtoName} 占位符（取文件名，去掉目录和 .proto 后缀） */
+        build2 {
+            vmFile = "LoginCommandManager.vm"
+            targetFile = baseDir('build/java/com/ceragon/monkeygame/hall/command/Proto${ProtoName}Manager.java')
+            /** 是否覆盖已存在的文件 */
+//            overwrite = true
+            /** proto 文件名称匹配规则，支持正则表达式 */
+            protoNameMatch = [".*"]
+            /** message 名称匹配规则，支持正则表达式；只有包含至少一个匹配 message 的 proto 文件才会生成 */
+            msgNameMatch = ["CL_.*"]
+        }
     }
 }

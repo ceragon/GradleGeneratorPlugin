@@ -101,14 +101,27 @@ public class MsgCodeBuild {
     private boolean processEveryProtoCodeConfig(String resourceRoot, EveryProtoBuildConfig config) {
         return this.protoFileDescList.stream()
                 .filter(desc -> FileUtil.nameFilter(config.getProtoNameMatch(), desc.getName()))
+                .filter(desc -> protoHasMatchMsg(desc, config))
                 .allMatch(desc -> processEveryProtoCode(resourceRoot, desc, config));
+    }
+
+    /**
+     * 配置了 msgNameMatch 时，只有包含至少一个匹配 message 的 proto 文件才会生成代码
+     */
+    private boolean protoHasMatchMsg(FileDescriptorDelegate desc, EveryProtoBuildConfig config) {
+        if (config.getMsgNameMatch() == null || config.getMsgNameMatch().isEmpty()) {
+            return true;
+        }
+        return desc.getMessageList().stream()
+                .anyMatch(msg -> FileUtil.nameFilter(config.getMsgNameMatch(), msg.getName()));
     }
 
     private boolean processEveryProtoCode(String resourceRoot, FileDescriptorDelegate protoFileDesc, EveryProtoBuildConfig config) {
         try {
             Map<String, Object> content = createContentMap();
             content.put("proto", protoFileDesc);
-            String destPath = PluginContext.pathFormat().format(config.getTargetFile());
+            String destPath = PluginContext.pathFormat().format(config.getTargetFile(), "ProtoName",
+                    FileUtil.protoNameOf(protoFileDesc.getName()));
             CodeGenTool.createCodeByPath(resourceRoot, config.getVmFile(), destPath, config.isOverwrite(), content);
             PluginContext.log().quiet("everyProtoCode generate success!name={}", config.getName());
             return true;
