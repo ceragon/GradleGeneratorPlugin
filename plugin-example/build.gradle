@@ -6,8 +6,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // 默认引用已发布版本；本地验证新特性时可指定：gradlew "-PpluginVersion=1.3.4-local" proto
-        classpath "io.github.ceragon:plugin:" + (project.findProperty('pluginVersion') ?: '1.3.3')
+        // 默认引用已发布版本；本地验证新特性时可指定：gradlew "-PtestPluginVersion=1.3.4-local" proto
+        classpath "io.github.ceragon:plugin:" + (project.findProperty('testPluginVersion') ?: '1.3.3')
     }
 }
 
@@ -86,9 +86,9 @@ proto {
         // 每个 proto 文件生成一个文件：targetFile 支持 ${ProtoName} 占位符（取文件名，去掉目录和 .proto 后缀）
         // 需要包含该特性的插件版本才会生效；本地验证方式：
         //   根目录：gradlew :plugin:publishToMavenLocal "-PPLUGIN_VERSION=1.3.4-local"
-        //   本目录：gradlew "-PpluginVersion=1.3.4-local" proto
+        //   本目录：gradlew "-PtestPluginVersion=1.3.4-local" proto
         // 注意：必须用单引号，双引号会被 Groovy 在配置阶段就插值
-        if (project.findProperty('pluginVersion')) {
+        if (project.findProperty('testPluginVersion')) {
             build2 {
                 vmFile = "ProtoMeta.vm"
                 targetFile = baseDir('build/proto-meta/${ProtoName}.txt')
