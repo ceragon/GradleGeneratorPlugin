@@ -25,6 +25,10 @@ class GradlePluginPluginFunctionalTest {
         File projectDir = new File("build/functionalTest");
         Files.createDirectories(projectDir.toPath());
         writeString(new File(projectDir, "settings.gradle"), "");
+        // 插件默认从 protofiles 目录读取 proto 文件，缺省时构建会因目录不存在而失败，这里先准备好
+        Files.createDirectories(new File(projectDir, "protofiles").toPath());
+        writeString(new File(projectDir, "protofiles/Foo.proto"),
+                "syntax = \"proto3\";\npackage demo;\nmessage Foo {\n  string name = 1;\n}\n");
         InputStream inputStream = GradlePluginPluginFunctionalTest.class.getResourceAsStream("/build.gradle");
         try (BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
              ){
