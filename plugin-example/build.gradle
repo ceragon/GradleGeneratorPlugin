@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'io.github.ceragon:plugin:1.3.3'
+        classpath 'io.github.ceragon:plugin:1.4.0'
     }
 }
 
@@ -81,6 +81,15 @@ proto {
             targetFile = baseDir("build/java/${PROJECT_PACKAGE_PATH}/hall/command/login/LoginCommandManager.java")
             // proto 文件名称匹配规则，支持正则表达式
             protoNameMatch = [".*ProtoLogin.proto"]
+        }
+        // 一个 proto 产出一个文件：targetFile 里的 ${ProtoName} 会替换成 proto 文件名（去掉目录和 .proto）
+        // 注意必须用单引号，双引号会被 Groovy 在配置阶段就插值
+        protoMeta {
+            vmFile = "ProtoMeta.vm"
+            targetFile = baseDir('build/proto-meta/${ProtoName}.txt')
+            protoNameMatch = [".*"]
+            // 只有包含至少一个匹配 message 的 proto 文件才会生成
+            msgNameMatch = [".*Request"]
         }
     }
 
