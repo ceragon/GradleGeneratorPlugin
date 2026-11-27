@@ -63,6 +63,12 @@ public class DescriptorLoader {
             if (SPECIAL_DECENDENCYS.contains(dependency)) {
                 continue;
             }
+            if (!allFdpMap.containsKey(dependency)) {
+                // 临时描述信息没有开 --include_imports，所以 proto 里 import 的外部文件（
+                // 例如通过 proto.includeDirectories 引入的公共 proto）不在描述信息里。
+                // buildFrom 已开启 allowUnknownDependencies，缺依赖时跳过即可。
+                continue;
+            }
             descriptors.add(descriptorMap.computeIfAbsent(dependency, DescriptorLoader::loadFileDescriptor));
         }
         try {

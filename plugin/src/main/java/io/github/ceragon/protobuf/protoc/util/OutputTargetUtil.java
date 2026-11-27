@@ -84,6 +84,15 @@ public class OutputTargetUtil {
             shaded = true;
         }
 
+        // 两个开关都为 false 时整个 target 不会生成任何文件：提前判定，一个 target 只提示一条 WARN。
+        // 原先是在 proto 循环里逐个打印 "Not changed <file>"，那句文案来自 2021 年，容易被误读成
+        // “文件内容没变”，其实是因为整个 target 被跳过了。这里只改日志，生成结果不变。
+        boolean skipAll = !target.isCleanOutputFolder() && !target.isOverwriteOutputFile();
+        if (skipAll) {
+            PluginContext.log().warn("outputTarget '" + target.getName()
+                    + "' is skipped: cleanOutputFolder and overwriteOutputFile are both false, so no proto file is generated");
+        }
+
         FileFilter fileFilter = new FileFilter(extension);
         for (String input : inputDirectoryList) {
             if (input == null) continue;
@@ -91,12 +100,12 @@ public class OutputTargetUtil {
             if (inputFile.exists() && inputFile.isDirectory()) {
                 Collection<File> protoFiles = FileUtils.listFiles(inputFile, fileFilter, TrueFileFilter.INSTANCE);
                 for (File protoFile : protoFiles) {
-                    if (target.isCleanOutputFolder() || target.isOverwriteOutputFile()) {
-                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, null,
-                                target.getOutputDirectory(), target.getOutputOptions());
-                    } else {
-                        PluginContext.log().quiet("Not changed " + protoFile);
+                    if (skipAll) continue;
+                    if (!FileUtil.nameFilter(target.getProtoNameMatch(), protoFile.getName())) {
+                        continue;
                     }
+                    processFile(includeDirectoryList, protocCommand, protoFile, targetType, target.getPluginPath(),
+                            target.getOutputDirectory(), target.getOutputOptions());
                 }
             } else {
                 if (inputFile.exists()) PluginContext.log().quiet(input + " is not a directory");
@@ -163,8 +172,9 @@ public class OutputTargetUtil {
         }
     }
 
-    private static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
-                                                   String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
+    // 包内可见，便于单测直接校验命令拼装
+    static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
+                                            String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
         BuildContext context = PluginContext.buildContext();
         final String version = context.getValue(ContextKey.PROTOC_VERSION);
         final boolean includeImports = context.getValue(ContextKey.INCLUDE_IMPORTS);
@@ -196,20 +206,15 @@ public class OutputTargetUtil {
     private static void buildOutputOptions(String type, String outputOptions, String outputDir, Collection<String> cmd) {
         if (StringUtils.isBlank(outputOptions)) {
             cmd.add("--" + type + "_out=" + outputDir);
-        } else {
-            if ("js".equals(type)) {
-                cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
-            } else {
-                cmd.add("--" + type + "_out=" + outputDir);
-            }
-            switch (type) {
-                case "go":
-                case "csharp":
-                    cmd.add("--" + type + "_opt=" + outputOptions);
-                    break;
-            }
+            return;
         }
-
+        if ("js".equals(type)) {
+            // js 的选项（import_style 等）按 protoc 的约定写在 --js_out 里
+            cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
+        } else {
+            cmd.add("--" + type + "_out=" + outputDir);
+            cmd.add("--" + type + "_opt=" + outputOptions);
+        }
     }
 
     private static void populateIncludes(List<File> includeDirectories, Collection<String> args) throws PluginTaskException {

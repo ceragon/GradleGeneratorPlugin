@@ -73,3 +73,29 @@ proto {
 
 注意 `targetFile` 里的占位符必须写在**单引号**字符串里，双引号会被 Groovy 在配置阶段当作变量插值。不同目录下的同名 proto 会得到相同的 `${ProtoName}`，仍然会互相覆盖。
 
+### 输出目标（outputTargets）的插件路径、文件过滤与 include 目录
+
+`outputTargets` 的每个目标支持 `pluginPath` 与 `protoNameMatch`，`proto` 扩展本身新增 `includeDirectories`：
+
+- `pluginPath`：给当前 `type` 指定自定义的 protoc 插件可执行文件，等价于 protoc 的 `--plugin=protoc-gen-<type>=<path>`（例如 `type = 'go'` 时指向 `protoc-gen-go`）；不配置时按 protoc 的默认规则在 `PATH` 里查找
+- `protoNameMatch`：按 proto **文件名**过滤，正则按全匹配生效，匹配的是带 `.proto` 后缀的文件名（不含目录）；不配置或为空时匹配全部
+- `includeDirectories`（写在 `proto` 上）：在 `protofiles` 之外追加 protoc 的 `-I` 目录，用来 import 公共 proto；相对路径按项目根目录解析
+
+`outputOptions` 现在对所有语言都生效：非 `js` 类型会拼成 `--<type>_opt=<outputOptions>`（此前只有 `go`、`csharp` 会拼，其它类型配置了也被静默丢弃），`js` 仍按 protoc 的约定写进 `--js_out=<outputOptions>:<outputDirectory>`。
+
+```groovy
+proto {
+    includeDirectories = [baseDir('protofiles/common')]
+
+    outputTargets {
+        goServer {
+            type = 'go'
+            pluginPath = 'C:/tools/protoc-gen-go.exe'
+            outputDirectory = baseDir('build/gen/go')
+            outputOptions = 'paths=source_relative'
+            protoNameMatch = ['.*Protocol.*']
+        }
+    }
+}
+```
+

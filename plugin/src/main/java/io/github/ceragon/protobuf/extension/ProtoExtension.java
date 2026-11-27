@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.util.internal.ConfigureUtil;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class ProtoExtension {
     private String protocCommand;
     @Internal("proto 文件的目录")
     private List<String> protoFilePaths;
+    @Internal("额外的 protoc -I 目录，用于 import protofiles 之外的公共 proto；相对路径按项目根目录解析")
+    private List<String> includeDirectories = new ArrayList<>();
 
     @Internal("输出配置")
     private final NamedDomainObjectContainer<OutputTarget> outputTargets;
