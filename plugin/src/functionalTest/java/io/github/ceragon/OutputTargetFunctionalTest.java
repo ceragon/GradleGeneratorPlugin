@@ -72,6 +72,45 @@ class OutputTargetFunctionalTest {
                 "protoNameMatch 只匹配文件名（不含目录），按目录写的正则不应命中任何文件，输出目录内容：" + listNames(genDir));
     }
 
+    @Test
+    void includeDirectoriesResolveImportsOutsideProtofiles() throws IOException {
+        File projectDir = prepareProject("includeDirs");
+        File commonDir = new File(projectDir, "includes/common");
+        assertTrue(commonDir.mkdirs(), "failed to create " + commonDir);
+        writeString(new File(commonDir, "Shared.proto"), ""
+                + "syntax = \"proto3\";\n"
+                + "package demo;\n"
+                + "message SharedMsg {\n"
+                + "  string id = 1;\n"
+                + "}\n");
+        writeString(new File(projectDir, "protofiles/Uses.proto"), ""
+                + "syntax = \"proto3\";\n"
+                + "package demo;\n"
+                + "import \"common/Shared.proto\";\n"
+                + "message UsesMsg {\n"
+                + "  SharedMsg shared = 1;\n"
+                + "}\n");
+        writeString(new File(projectDir, "build.gradle"), ""
+                + "plugins {\n"
+                + "    id('io.github.ceragon.proto')\n"
+                + "}\n"
+                + "\n"
+                + "proto {\n"
+                + "    includeDirectories = [baseDir('includes')]\n"
+                + "    outputTargets {\n"
+                + "        javaCode {\n"
+                + "            type = 'java'\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+
+        runProto(projectDir);
+
+        File genDir = new File(projectDir, "build/generated-sources/javaCode/demo");
+        assertTrue(new File(genDir, "Uses.java").exists(),
+                "配置 includeDirectories 后 common/Shared.proto 才 import 得到，输出目录内容：" + listNames(genDir));
+    }
+
     private File prepareProject(String name) throws IOException {
         File projectDir = new File("build/functionalTestOutputTargets/" + name);
         deleteRecursively(projectDir);

@@ -7,9 +7,11 @@ import io.github.ceragon.protobuf.protoc.DescriptorLoader;
 import io.github.ceragon.protobuf.protoc.MsgCodeBuild;
 import io.github.ceragon.protobuf.protoc.ProtocBuild;
 import io.github.ceragon.util.PluginTaskException;
+import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskExecutionException;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class ProtoGeneratorTask {
                     .protocVersion(extension.getProtocVersion())
                     .protocCommand(extension.getProtocCommand())
                     .inputDirectories(extension.getProtoFilePaths())
+                    .includeDirectories(buildIncludeDirectories(task.getProject(), extension.getIncludeDirectories()))
                     .includeStdTypes(true)
                     .includeImports(false)
                     .build();
@@ -62,6 +65,25 @@ public class ProtoGeneratorTask {
         } catch (Throwable e) {
             throw new TaskExecutionException(task, e);
         }
+    }
+
+    /**
+     * proto.includeDirectories 转成 protoc 的 -I 目录。protoc 的 -I 用绝对路径最稳，否则会按
+     * protoc 进程的工作目录解析，所以相对路径统一按项目根目录补全；存在的校验交给 IncludeUtil。
+     */
+    private File[] buildIncludeDirectories(Project project, List<String> includeDirectories) {
+        if (includeDirectories == null || includeDirectories.isEmpty()) {
+            return null;
+        }
+        List<File> result = new ArrayList<>(includeDirectories.size());
+        for (String includeDirectory : includeDirectories) {
+            File include = new File(includeDirectory);
+            if (!include.isAbsolute()) {
+                include = new File(project.getProjectDir(), includeDirectory);
+            }
+            result.add(include);
+        }
+        return result.toArray(new File[0]);
     }
 
     private void prepareExecute(Task task) {
