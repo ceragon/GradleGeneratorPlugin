@@ -1,5 +1,6 @@
 package io.github.ceragon;
 
+import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
 
@@ -111,6 +112,34 @@ class OutputTargetFunctionalTest {
                 "配置 includeDirectories 后 common/Shared.proto 才 import 得到，输出目录内容：" + listNames(genDir));
     }
 
+    @Test
+    void skippedTargetLogsSingleWarning() throws IOException {
+        File projectDir = prepareProject("skipped");
+        writeString(new File(projectDir, "build.gradle"), ""
+                + "plugins {\n"
+                + "    id('io.github.ceragon.proto')\n"
+                + "}\n"
+                + "\n"
+                + "proto {\n"
+                + "    outputTargets {\n"
+                + "        skipped {\n"
+                + "            cleanOutputFolder = false\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+
+        BuildResult result = runProto(projectDir);
+
+        String output = result.getOutput();
+        String warn = "outputTarget 'skipped' is skipped: cleanOutputFolder and overwriteOutputFile are both false";
+        assertEquals(1, countOccurrences(output, warn),
+                "整个 target 被跳过时只应打一条 WARN，实际输出：\n" + output);
+        assertFalse(output.contains("Not changed"),
+                "不再逐个 proto 打印 Not changed，实际输出：\n" + output);
+        assertFalse(new File(projectDir, "build/generated-sources/skipped/demo/Alpha.java").exists(),
+                "两个开关都是 false，这个 target 不应生成任何文件");
+    }
+
     private File prepareProject(String name) throws IOException {
         File projectDir = new File("build/functionalTestOutputTargets/" + name);
         deleteRecursively(projectDir);
@@ -130,13 +159,23 @@ class OutputTargetFunctionalTest {
                 + "}\n";
     }
 
-    private void runProto(File projectDir) {
+    private BuildResult runProto(File projectDir) {
         GradleRunner runner = GradleRunner.create();
         runner.forwardOutput();
         runner.withPluginClasspath();
         runner.withArguments("proto");
         runner.withProjectDir(projectDir);
-        runner.build();
+        return runner.build();
+    }
+
+    private int countOccurrences(String text, String target) {
+        int count = 0;
+        int index = text.indexOf(target);
+        while (index >= 0) {
+            count++;
+            index = text.indexOf(target, index + target.length());
+        }
+        return count;
     }
 
     private File[] listFiles(File dir) {

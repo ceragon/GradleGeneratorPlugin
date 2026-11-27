@@ -84,6 +84,15 @@ public class OutputTargetUtil {
             shaded = true;
         }
 
+        // 两个开关都为 false 时整个 target 不会生成任何文件：提前判定，一个 target 只提示一条 WARN。
+        // 原先是在 proto 循环里逐个打印 "Not changed <file>"，那句文案来自 2021 年，容易被误读成
+        // “文件内容没变”，其实是因为整个 target 被跳过了。这里只改日志，生成结果不变。
+        boolean skipAll = !target.isCleanOutputFolder() && !target.isOverwriteOutputFile();
+        if (skipAll) {
+            PluginContext.log().warn("outputTarget '" + target.getName()
+                    + "' is skipped: cleanOutputFolder and overwriteOutputFile are both false, so no proto file is generated");
+        }
+
         FileFilter fileFilter = new FileFilter(extension);
         for (String input : inputDirectoryList) {
             if (input == null) continue;
@@ -91,15 +100,12 @@ public class OutputTargetUtil {
             if (inputFile.exists() && inputFile.isDirectory()) {
                 Collection<File> protoFiles = FileUtils.listFiles(inputFile, fileFilter, TrueFileFilter.INSTANCE);
                 for (File protoFile : protoFiles) {
+                    if (skipAll) continue;
                     if (!FileUtil.nameFilter(target.getProtoNameMatch(), protoFile.getName())) {
                         continue;
                     }
-                    if (target.isCleanOutputFolder() || target.isOverwriteOutputFile()) {
-                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, target.getPluginPath(),
-                                target.getOutputDirectory(), target.getOutputOptions());
-                    } else {
-                        PluginContext.log().quiet("Not changed " + protoFile);
-                    }
+                    processFile(includeDirectoryList, protocCommand, protoFile, targetType, target.getPluginPath(),
+                            target.getOutputDirectory(), target.getOutputOptions());
                 }
             } else {
                 if (inputFile.exists()) PluginContext.log().quiet(input + " is not a directory");
