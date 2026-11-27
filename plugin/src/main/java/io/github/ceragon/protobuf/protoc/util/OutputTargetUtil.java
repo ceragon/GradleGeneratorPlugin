@@ -92,7 +92,7 @@ public class OutputTargetUtil {
                 Collection<File> protoFiles = FileUtils.listFiles(inputFile, fileFilter, TrueFileFilter.INSTANCE);
                 for (File protoFile : protoFiles) {
                     if (target.isCleanOutputFolder() || target.isOverwriteOutputFile()) {
-                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, null,
+                        processFile(includeDirectoryList, protocCommand, protoFile, targetType, target.getPluginPath(),
                                 target.getOutputDirectory(), target.getOutputOptions());
                     } else {
                         PluginContext.log().quiet("Not changed " + protoFile);
@@ -163,8 +163,9 @@ public class OutputTargetUtil {
         }
     }
 
-    private static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
-                                                   String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
+    // 包内可见，便于单测直接校验命令拼装
+    static Collection<String> buildCommand(List<File> includeDirectories, File file, String type,
+                                            String pluginPath, String outputDir, String outputOptions) throws PluginTaskException {
         BuildContext context = PluginContext.buildContext();
         final String version = context.getValue(ContextKey.PROTOC_VERSION);
         final boolean includeImports = context.getValue(ContextKey.INCLUDE_IMPORTS);
@@ -196,20 +197,15 @@ public class OutputTargetUtil {
     private static void buildOutputOptions(String type, String outputOptions, String outputDir, Collection<String> cmd) {
         if (StringUtils.isBlank(outputOptions)) {
             cmd.add("--" + type + "_out=" + outputDir);
-        } else {
-            if ("js".equals(type)) {
-                cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
-            } else {
-                cmd.add("--" + type + "_out=" + outputDir);
-            }
-            switch (type) {
-                case "go":
-                case "csharp":
-                    cmd.add("--" + type + "_opt=" + outputOptions);
-                    break;
-            }
+            return;
         }
-
+        if ("js".equals(type)) {
+            // js 的选项（import_style 等）按 protoc 的约定写在 --js_out 里
+            cmd.add("--" + type + "_out=" + outputOptions + ":" + outputDir);
+        } else {
+            cmd.add("--" + type + "_out=" + outputDir);
+            cmd.add("--" + type + "_opt=" + outputOptions);
+        }
     }
 
     private static void populateIncludes(List<File> includeDirectories, Collection<String> args) throws PluginTaskException {

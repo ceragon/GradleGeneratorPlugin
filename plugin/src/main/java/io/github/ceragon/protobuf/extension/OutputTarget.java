@@ -25,4 +25,7 @@ public class OutputTarget {
     @Internal("导出的可选项，支持protoc的所有配置")
     String outputOptions;
 
+    @Internal("自定义 protoc 插件的可执行文件路径，等价于 --plugin=protoc-gen-<type>=<path>；为空时按 protoc 的默认规则查找")
+    String pluginPath = null;
+
 }
